@@ -10,21 +10,20 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
 
     private AudioClip microphoneClip;           // ljud buffer som unity spelar in på
     [SerializeField] private string microphoneName; // namnet på mikrofonen som spelar in
-    
+
+    [SerializeField] private TMP_Text pitchText; // text som visar upptäckt frekvens
     [SerializeField] private TMP_Dropdown microphoneDropdown;
+
     private string[] availableMicrophones;
     
     private float[] samples;                    // array med frekvenser
-
     private int previousPosition;               // föregående position/tid att jämföra med
     private long capturedFrames;                // samling av allt som spelats in
 
     //
 
     private PitchDetection pitchDetection;
-
     private float[] monoSamples;
-
     public float CurrentPitchHz
     {
         get;
@@ -163,6 +162,18 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             CurrentPitchHz.ToString("F1") +
             " Hz"
         );
+
+        if (pitchText != null)
+        {
+            if (CurrentPitchHz > 0)
+            {
+                pitchText.text = $"{CurrentPitchHz:F1} Hz";
+            }
+            else
+            {
+                pitchText.text = "0 Hz";
+            }
+        }
 
         // Beräkna RMS amplitud
         //float sumOfSquares = 0f;
