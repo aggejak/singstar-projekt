@@ -82,6 +82,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
 
         microphoneClip =
             Microphone.Start(microphoneName, true, 2, 48000);
+        Debug.Log(microphoneClip);
 
         if (microphoneClip == null)
         {
@@ -127,7 +128,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             return;
         }
 
-        /// Beräkna RMS amplitud
+        // Beräkna RMS amplitud
         float sumOfSquares = 0f;
 
         for (int i = 0; i < samples.Length; i++)
