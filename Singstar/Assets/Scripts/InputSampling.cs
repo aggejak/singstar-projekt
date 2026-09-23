@@ -10,17 +10,31 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
 
     private AudioClip microphoneClip;           // ljud buffer som unity spelar in på
     [SerializeField] private string microphoneName; // namnet på mikrofonen som spelar in
-    
+
+    [SerializeField] private TMP_Text frequencyText; // text som visar upptäckt frekvens
+    [SerializeField] private TMP_Text pitchText; // text som visar upptäckt tonläge
     [SerializeField] private TMP_Dropdown microphoneDropdown;
+
     private string[] availableMicrophones;
     
     private float[] samples;                    // array med frekvenser
-
     private int previousPosition;               // föregående position/tid att jämföra med
     private long capturedFrames;                // samling av allt som spelats in
 
+    //
+
+    private PitchDetection pitchDetection;
+    private float[] monoSamples;
+    public float CurrentPitchHz
+    {
+        get;
+        private set;
+    }
+
     private void OnEnable()
     {
+        pitchDetection = new PitchDetection();
+
         // kolla att dropdownen är ansluten i Unity
         if (microphoneDropdown == null)
         {
@@ -82,7 +96,6 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
 
         microphoneClip =
             Microphone.Start(microphoneName, true, 2, 48000);
-        Debug.Log(microphoneClip);
 
         if (microphoneClip == null)
         {
@@ -91,6 +104,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         }
 
         samples = new float[WindowSize * microphoneClip.channels];
+        monoSamples = new float[WindowSize];
 
         Debug.Log("Using microphone: " + microphoneName);
     }
@@ -128,15 +142,51 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             return;
         }
 
-        // Beräkna RMS amplitud
-        float sumOfSquares = 0f;
+        int channels = microphoneClip.channels; // hämta antalet ljudkanaler
 
-        for (int i = 0; i < samples.Length; i++)
+        for (int frame = 0; frame < WindowSize; frame++)
         {
-            sumOfSquares += samples[i] * samples[i];
+            float sum = 0f;
+
+            for (int channel = 0; channel < channels; channel++)
+            {
+                int index = frame * channels + channel;
+                sum += samples[index];
+            }
+            monoSamples[frame] = sum / channels;
         }
 
-        inputLevel = Mathf.Sqrt(sumOfSquares / samples.Length);
+        CurrentPitchHz = pitchDetection.DetectPitch(monoSamples, microphoneClip.frequency);
+
+        Debug.Log(
+            "Upptäckt pitch: " +
+            CurrentPitchHz.ToString("F1") +
+            " Hz"
+        );
+
+        if (frequencyText != null)
+        {
+            if (CurrentPitchHz > 0)
+            {
+                frequencyText.text = $"{CurrentPitchHz:F1} Hz";
+                pitchText.text = $"{FrequencyToPitch.ConvertedPitch(CurrentPitchHz):F1} cent";
+            }
+            else
+            {
+                frequencyText.text = "0 Hz";
+                pitchText.text = "0 cent";
+            }
+        }
+
+        // Beräkna RMS amplitud
+        //float sumOfSquares = 0f;
+
+        //for (int i = 0; i < samples.Length; i++)
+        //{
+        //    sumOfSquares += samples[i] * samples[i];
+        //}
+
+        //inputLevel = Mathf.Sqrt(sumOfSquares / samples.Length);
     }
 
     private void OnDisable() // stäng av allt
@@ -149,5 +199,6 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         }
 
         inputLevel = 0f;
+        CurrentPitchHz = 0f;
     }
 }
