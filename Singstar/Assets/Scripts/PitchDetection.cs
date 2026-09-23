@@ -15,7 +15,7 @@ public class PitchDetection
             sumSquares += samples[i] * samples[i];
         }
 
-        float rms = Mathf.Sqrt(sumSquares / sampleRate);
+        float rms = Mathf.Sqrt(sumSquares / samples.Length);
 
         // Kollar om ljudnivån är tillräckligt stark.
 
