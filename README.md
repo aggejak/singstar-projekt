@@ -32,3 +32,19 @@ Första versionen:
 Delen ska senare ta emot **frekvens i Hz** och **tonHittad (true/false)** från pitchdetektorn. När ingen ton hittas döljs markören.
 
 När detta fungerar bygger vi vidare med poäng och en tidslinje med låtens måltoner.
+
+## Köra pitchtestet
+
+Öppna `Singstar/Assets/Scenes/PitchTestScene.unity` i Unity.
+Markera `PitchTest`, välj Test Frequency i Inspector och tryck Play.
+Resultatet skrivs en gång i Console. Testet spelar inte upp ljud och behöver ingen mikrofon.
+Med 200 Hz och 48000 Hz samplingsfrekvens ska resultatet bli 200 Hz.
+Ändra frekvensen före Play; heltalslag kan ge en liten frekvensavvikelse.
+
+Nuvarande API är `new PitchDetection().DetectPitch(samples, sampleRate)`:
+det returnerar Hz, och 0 betyder ingen hittad ton. `SingstarController` använder
+`frequency > 0f` som markering för hittad ton tills ett separat resultatformat införs.
+`InputSampling.GetAudioSamples()` ger ett monoblock eller null innan data finns;
+`GetSampleRate()` ger mikrofonklippets faktiska samplingsfrekvens.
+
+Använd separata testscener när ni arbetar parallellt.

@@ -6,7 +6,12 @@ public class PitchDetection
     // Retunerar en frekvens om hittad
     public float DetectPitch(float[] samples, int sampleRate)
     {
-        // Räkna ut RMS för våra samples
+        if (samples == null || samples.Length == 0 || sampleRate <= 0)
+        {
+            return 0f;
+        }
+
+        // RÃ¤kna ut RMS fÃ¶r vÃ¥ra samples
 
         float sumSquares = 0f;
 
@@ -15,9 +20,9 @@ public class PitchDetection
             sumSquares += samples[i] * samples[i];
         }
 
-        float rms = Mathf.Sqrt(sumSquares / sampleRate);
+        float rms = Mathf.Sqrt(sumSquares / samples.Length);
 
-        // Kollar om ljudnivån är tillräckligt stark.
+        // Kollar om ljudnivÃ¥n Ã¤r tillrÃ¤ckligt stark.
 
         float silenceThreshold = 0.01f;
 
@@ -26,8 +31,8 @@ public class PitchDetection
             return 0f;
         }
 
-        // Sätter gränser för rimliga frekvenser (80 - 1000 Hz)
-        // Och räknar ut intervall där Lag = (samplerate / frequency)
+        // SÃ¤tter grÃ¤nser fÃ¶r rimliga frekvenser (80 - 1000 Hz)
+        // Och rÃ¤knar ut intervall dÃ¤r Lag = (samplerate / frequency)
 
         float minFrequency = 80f;
         float maxFrequency = 1000f;
@@ -35,7 +40,7 @@ public class PitchDetection
         int minLag = Mathf.CeilToInt(sampleRate / maxFrequency);
         int maxLag = Mathf.FloorToInt(sampleRate / minFrequency);
 
-        //Kolla så maxLag inte är längre än halva blocket
+        //Kolla sÃ¥ maxLag inte Ã¤r lÃ¤ngre Ã¤n halva blocket
 
         maxLag = Mathf.Min(maxLag, samples.Length / 2);
 
@@ -69,7 +74,7 @@ public class PitchDetection
             correlations[lag] = correlation;
         }
 
-        // Returnerar frekvens vid första peak över threshold
+        // Returnerar frekvens vid fÃ¶rsta peak Ã¶ver threshold
 
         float correlationThreshold = 0.8f;
 

@@ -9,11 +9,15 @@ public class SingstarController : MonoBehaviour
     // Dra in ditt InputSampling-script här via Unity-inspektorn
     public InputSampling inputSampling; 
 
+    private readonly PitchDetection pitchDetector = new PitchDetection();
+
     // Avvikelsen i halvtoner (n)
     private float currentDeviation;
 
     void Update()
     {
+        if (inputSampling == null) return;
+
         //  Hämta float-array och samplingsfrekvens från InputSampling (Exempel på namn)
         // (Kräver att du har publika metoder eller variabler för detta i InputSampling)
         float[] audioBlock = inputSampling.GetAudioSamples();
@@ -22,17 +26,17 @@ public class SingstarController : MonoBehaviour
         // Om vi inte har fått någon data än, avbryt för denna frame
         if (audioBlock == null || audioBlock.Length == 0) return;
 
-        //  Skicka ljudblocket till PitchDetector
-        // (Använder det statiska funktionsanropet vi skapade tidigare)
-        PitchResult result = PitchDetector.DetectPitch(audioBlock, sampleRate);
+        // Nuvarande detektor returnerar Hz, eller 0 om ingen ton hittas.
+        float frequency = pitchDetector.DetectPitch(audioBlock, sampleRate);
+        bool toneFound = frequency > 0f;
 
         //  Om en ton hittades, jämför med måltonen via PitchScoring
-        if (result.ToneFound)
+        if (toneFound)
         {
             // Beräkna n (avvikelse i halvtoner)
-            currentDeviation = PitchScoring.CalculateSemitoneDeviation(result.Frequency, targetFrequency);
+            currentDeviation = PitchScoring.CalculateSemitoneDeviation(frequency, targetFrequency);
             
-            Debug.Log($"Sjungen frekvens: {result.Frequency:F1} Hz. Avvikelse (n): {currentDeviation:F2} halvtoner.");
+            Debug.Log($"Sjungen frekvens: {frequency:F1} Hz. Avvikelse (n): {currentDeviation:F2} halvtoner.");
             
             // Här skickar du sedan 'currentDeviation' vidare till UI-scriptet 
             // för att flytta markören på skärmen upp eller ner!

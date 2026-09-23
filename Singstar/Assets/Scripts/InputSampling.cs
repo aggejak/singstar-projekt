@@ -14,7 +14,20 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
     [SerializeField] private TMP_Dropdown microphoneDropdown;
     private string[] availableMicrophones;
     
-    private float[] samples;                    // array med frekvenser
+    private float[] samples;                    // interleaved ljudsamplingar från mikrofonen
+    private float[] monoSamples;
+    private bool hasAudioBlock;
+
+    // Returnerar null tills ett helt ljudblock har spelats in.
+    public float[] GetAudioSamples()
+    {
+        return hasAudioBlock ? monoSamples : null;
+    }
+
+    public int GetSampleRate()
+    {
+        return microphoneClip != null ? microphoneClip.frequency : 0;
+    }
 
     private int previousPosition;               // föregående position/tid att jämföra med
     private long capturedFrames;                // samling av allt som spelats in
@@ -74,6 +87,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             microphoneClip = null;
         }
 
+        hasAudioBlock = false;
         inputLevel = 0f;
         previousPosition = 0;
         capturedFrames = 0;
@@ -90,6 +104,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         }
 
         samples = new float[WindowSize * microphoneClip.channels];
+        monoSamples = new float[WindowSize];
 
         Debug.Log("Using microphone: " + microphoneName);
     }
@@ -127,6 +142,19 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             return;
         }
 
+        // Blanda eventuella flera kanaler till 2048 monosamplingar.
+        int channels = microphoneClip.channels;
+        for (int frame = 0; frame < WindowSize; frame++)
+        {
+            float sum = 0f;
+            for (int channel = 0; channel < channels; channel++)
+            {
+                sum += samples[frame * channels + channel];
+            }
+            monoSamples[frame] = sum / channels;
+        }
+        hasAudioBlock = true;
+
         /// Beräkna RMS amplitud
         float sumOfSquares = 0f;
 
@@ -147,6 +175,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             microphoneClip = null;
         }
 
+        hasAudioBlock = false;
         inputLevel = 0f;
     }
 }
