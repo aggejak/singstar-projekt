@@ -78,20 +78,36 @@ public static class SongNotes
         new TargetNote(62.52f, 67.28f, G4),  // nytt
     };
 
-    // Tar emot MIDI-tonnummer, inte frekvens i Hz.
-    public static bool IsPitchMatch(float detectedMidi, float targetMidi)
+    // Anropas med: bool onPitch = SongNotes.CheckPitch(songTime, detectedMidi);
+    public static bool CheckPitch(float songTime, float detectedMidi)
     {
+
+        // Kontrollera att mätvärdet är giltigt.
+
         if (float.IsNaN(detectedMidi) || float.IsInfinity(detectedMidi))
         {
             return false;
         }
 
-        // Kortaste avståndet i halvtoner, oavsett oktav.
-        float deviation = Mathf.Repeat(
-            detectedMidi - targetMidi + 6f,
-            12f
-        ) - 6f;
+        foreach (TargetNote note in Notes)
+        {
+            // Hitta måltonen som gäller just nu.
+            if (songTime >= note.startTime && songTime < note.endTime)
+            {
+                float difference = detectedMidi - note.targetMidi;
 
-        return Mathf.Abs(deviation) <= ToleranceSemitones;
+                // Flytta skillnaden hela oktaver mot noll.
+                while (difference > 6f)
+                    difference -= 12f;
+
+                while (difference < -6f)
+                    difference += 12f;
+
+                return Mathf.Abs(difference) <= ToleranceSemitones;
+            }
+        }
+
+        // Ingen målton vid denna tid.
+        return false;
     }
 }
