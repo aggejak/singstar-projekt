@@ -168,8 +168,8 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         {
             if (CurrentPitchHz > 0)
             {
-                frequencyText.text = $"{CurrentPitchHz:F1} Hz";
-                pitchText.text = $"{FrequencyToPitch.ConvertedPitch(CurrentPitchHz):F1} cent";
+                frequencyText.text = $"{CurrentPitchHz:F0} Hz";
+                pitchText.text = $"{FrequencyToPitch.ConvertedPitch(CurrentPitchHz):F0} cent";
             }
             else
             {
