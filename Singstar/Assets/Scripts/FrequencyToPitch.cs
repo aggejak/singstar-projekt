@@ -10,7 +10,7 @@ public class FrequencyToPitch
             return float.NaN;
         }
 
-        return 69f + 12f * Mathf.Log(frequency / 400f, 2f);
+        return 69f + 12f * Mathf.Log(frequency / 440f, 2f);
         
     }
 }
