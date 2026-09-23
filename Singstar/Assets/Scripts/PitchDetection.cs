@@ -69,6 +69,8 @@ public class PitchDetection
             correlations[lag] = correlation;
         }
 
+        // Returnerar frekvens vid första peak över threshold
+
         float correlationThreshold = 0.8f;
 
         for (int lag = minLag + 1; lag < maxLag; lag++)
