@@ -11,7 +11,8 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
     private AudioClip microphoneClip;           // ljud buffer som unity spelar in på
     [SerializeField] private string microphoneName; // namnet på mikrofonen som spelar in
 
-    [SerializeField] private TMP_Text pitchText; // text som visar upptäckt frekvens
+    [SerializeField] private TMP_Text frequencyText; // text som visar upptäckt frekvens
+    [SerializeField] private TMP_Text pitchText; // text som visar upptäckt tonläge
     [SerializeField] private TMP_Dropdown microphoneDropdown;
 
     private string[] availableMicrophones;
@@ -163,15 +164,17 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             " Hz"
         );
 
-        if (pitchText != null)
+        if (frequencyText != null)
         {
             if (CurrentPitchHz > 0)
             {
-                pitchText.text = $"{CurrentPitchHz:F1} Hz";
+                frequencyText.text = $"{CurrentPitchHz:F1} Hz";
+                pitchText.text = $"{FrequencyToPitch.ConvertedPitch(CurrentPitchHz):F1} cent";
             }
             else
             {
-                pitchText.text = "0 Hz";
+                frequencyText.text = "0 Hz";
+                pitchText.text = "0 cent";
             }
         }
 
