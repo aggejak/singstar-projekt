@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
 
-public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be attachable to a GameObject
+public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be attachable to a GameObject
 {
-    [SerializeField] private float inputLevel;  // uppmätta ljudets amplitud
+    //[SerializeField] private float inputLevel;  // uppmätta ljudets amplitud
 
     private const int WindowSize = 2048;        // krävs för monoinspelning. stereo: 4096
 
@@ -64,11 +64,11 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             Debug.LogError("Ingen mikrofon hittad");
     }
 
-    public void StartSelectedMicrophone()
+    public bool StartSelectedMicrophone()
     {
         // Kontrollera att dropdownen och mikrofonlistan finns
         if (microphoneDropdown == null || availableMicrophones == null)
-            return;
+            return false;
 
         // Dropdown-alternativ 0 är instruktionen, därför börjar mic index på 1
         int deviceIndex = microphoneDropdown.value - 1;
@@ -77,7 +77,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         if (deviceIndex < 0 || deviceIndex >= availableMicrophones.Length)
         {
             Debug.LogWarning("Välj en mikrofon först");
-            return;
+            return false;
         }
 
         // Om en tidigare inspelning fortfarande körs, stoppa den innan den nya inspelningen startas
@@ -88,7 +88,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             microphoneClip = null;
         }
 
-        inputLevel = 0f;
+        //inputLevel = 0f;
         previousPosition = 0;
         capturedFrames = 0;
 
@@ -100,13 +100,15 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
         if (microphoneClip == null)
         {
             Debug.LogError("Could not start microphone recording.");
-            return;
+            return false;
         }
 
         samples = new float[WindowSize * microphoneClip.channels];
         monoSamples = new float[WindowSize];
 
         Debug.Log("Using microphone: " + microphoneName);
+
+        return true;
     }
 
     private void Update() // inspelning av ljud
@@ -198,7 +200,7 @@ public class InputSampling : MonoBehaviour // inherit from MonoBehaviour to be a
             microphoneClip = null;
         }
 
-        inputLevel = 0f;
+        //inputLevel = 0f;
         CurrentPitchHz = 0f;
     }
 }

@@ -26,9 +26,6 @@ public static class SongNotes
     private const float Fs4 = 66f;
     private const float G4 = 67f;
 
-    // 0.06 halvtoner = 6 cent
-    public const float ToleranceSemitones = 0.06f;
-
     // Tider i sekunder från ljudfilens början.
     // Ej uppmätta tider är fortfarande uppskattningar.
     public static readonly TargetNote[] Notes =
@@ -78,36 +75,36 @@ public static class SongNotes
         new TargetNote(62.52f, 67.28f, G4),  // nytt
     };
 
-    // Anropas med: bool onPitch = SongNotes.CheckPitch(songTime, detectedMidi);
-    public static bool CheckPitch(float songTime, float detectedMidi)
+    public static bool CheckPitch(TargetNote target, float detectedMidi, float tolerance)
     {
-
-        // Kontrollera att mätvärdet är giltigt.
-
-        if (float.IsNaN(detectedMidi) || float.IsInfinity(detectedMidi))
+        if (target == null ||
+            float.IsNaN(detectedMidi) ||
+            float.IsInfinity(detectedMidi))
         {
             return false;
         }
 
+        float difference = detectedMidi - target.targetMidi;
+
+        // Flytta skillnaden hela oktaver mot noll.
+        while (difference > 6f)
+            difference -= 12f;
+
+        while (difference < -6f)
+            difference += 12f;
+
+        return Mathf.Abs(difference) <= tolerance;
+    }
+    public static TargetNote GetCurrentNote(float songTime)
+    {
         foreach (TargetNote note in Notes)
         {
-            // Hitta måltonen som gäller just nu.
             if (songTime >= note.startTime && songTime < note.endTime)
             {
-                float difference = detectedMidi - note.targetMidi;
-
-                // Flytta skillnaden hela oktaver mot noll.
-                while (difference > 6f)
-                    difference -= 12f;
-
-                while (difference < -6f)
-                    difference += 12f;
-
-                return Mathf.Abs(difference) <= ToleranceSemitones;
+                return note;
             }
         }
 
-        // Ingen målton vid denna tid.
-        return false;
+        return null;
     }
 }
