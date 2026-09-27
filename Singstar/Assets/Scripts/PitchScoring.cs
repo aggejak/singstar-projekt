@@ -2,16 +2,37 @@ using UnityEngine;
 
 public static class PitchScoring
 {
-    public static float CalculateSemitoneDeviation(float currentFrequency, float targetFrequency) 
+    public static float CalculateAccuracyFromMidi(
+        float detectedMidi,
+        float targetMidi,
+        float tolerance)
     {
-        // Förhindra krasch om frekvensen råkar vara 0 (log(0) är ogiltigt)
-        if (currentFrequency <= 0f || targetFrequency <= 0f) 
+        if (float.IsNaN(detectedMidi) || float.IsInfinity(detectedMidi))
         {
             return 0f;
         }
 
-        float semitonesDiff = 12f * Mathf.Log(currentFrequency / targetFrequency, 2f);
+        float difference = detectedMidi - targetMidi;
 
-        return semitonesDiff; 
+        // Flytta skillnaden till närmaste oktav
+        while (difference > 6f)
+        {
+            difference -= 12f;
+        }
+
+        while (difference < -6f)
+        {
+            difference += 12f;
+        }
+
+        float absDifference = Mathf.Abs(difference);
+
+        if (absDifference > tolerance)
+        {
+            return 0f;
+        }
+
+        // 1 = perfekt träff, 0 = utanför tolerans
+        return 1f - (absDifference / tolerance);
     }
 }

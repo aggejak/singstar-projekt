@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
@@ -6,7 +7,12 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject gameView;
     [SerializeField] private MicrophoneInput microphoneInput;
     [SerializeField] private AudioSource songAudioSource;
+
     [SerializeField, Range(0f, 1f)] private float pitchTolerance = 0.3f;
+
+    [Header("Scoring")]
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private float maxPointsPerSecond = 100f;
 
     public bool IsPlaying { get; private set; }
     public bool HasPitch { get; private set; }
@@ -14,14 +20,16 @@ public class GameController : MonoBehaviour
     public TargetNote CurrentTarget { get; private set; }
     public bool OnPitch { get; private set; }
     public float SongTime => songAudioSource.time;
-    // Starta menun
+
+    public float Score { get; private set; }
+
     private void Start()
     {
         startMenu.SetActive(true);
         gameView.SetActive(false);
+        UpdateScoreUI();
     }
 
-    // Starta spel
     public void StartGame()
     {
         bool microphoneStarted = microphoneInput.StartSelectedMicrophone();
@@ -31,13 +39,14 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        //Byt till GameView
         startMenu.SetActive(false);
         gameView.SetActive(true);
 
-        // Starta låt
         songAudioSource.time = 0f;
         songAudioSource.Play();
+
+        Score = 0f;
+        UpdateScoreUI();
 
         IsPlaying = true;
     }
@@ -49,7 +58,6 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        // Nollställ så att ett gammalt "rätt" inte ligger kvar.
         HasPitch = false;
         OnPitch = false;
         CurrentMidi = float.NaN;
@@ -71,13 +79,44 @@ public class GameController : MonoBehaviour
         HasPitch = true;
         CurrentMidi = FrequencyToPitch.ConvertedPitch(detectedHz);
 
-        float songTime = songAudioSource.time;
         OnPitch = SongNotes.CheckPitch(CurrentTarget, CurrentMidi, pitchTolerance);
 
+        UpdateScore();
+
         Debug.Log(
-            $"Tid: {songTime:F2} s | " +
+            $"Tid: {SongTime:F2} s | " +
             $"MIDI: {CurrentMidi:F2} | " +
-            $"Rätt ton: {OnPitch}"
+            $"RÃ¤tt ton: {OnPitch} | " +
+            $"Score: {Score:F0}"
         );
+    }
+
+    private void UpdateScore()
+    {
+        if (CurrentTarget == null || !HasPitch)
+        {
+            return;
+        }
+
+        float accuracy = PitchScoring.CalculateAccuracyFromMidi(
+            CurrentMidi,
+            CurrentTarget.targetMidi,
+            pitchTolerance
+        );
+
+        float pointsThisFrame =
+            accuracy * maxPointsPerSecond * Time.deltaTime;
+
+        Score += pointsThisFrame;
+
+        UpdateScoreUI();
+    }
+
+    private void UpdateScoreUI()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = $"Score: {Mathf.RoundToInt(Score)}";
+        }
     }
 }
