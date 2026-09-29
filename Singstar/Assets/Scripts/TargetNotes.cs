@@ -75,26 +75,26 @@ public static class SongNotes
         new TargetNote(62.52f, 67.28f, G4),  // nytt
     };
 
-    public static bool CheckPitch(TargetNote target, float detectedMidi, float tolerance)
-    {
-        if (target == null ||
-            float.IsNaN(detectedMidi) ||
-            float.IsInfinity(detectedMidi))
-        {
-            return false;
-        }
+    //public static bool CheckPitch(TargetNote target, float detectedMidi, float tolerance)
+    //{
+    //    if (target == null ||
+    //        float.IsNaN(detectedMidi) ||
+    //        float.IsInfinity(detectedMidi))
+    //    {
+    //        return false;
+    //    }
 
-        float difference = detectedMidi - target.targetMidi;
+    //    float difference = detectedMidi - target.targetMidi;
 
-        // Flytta skillnaden hela oktaver mot noll.
-        while (difference > 6f)
-            difference -= 12f;
+    //    // Flytta skillnaden hela oktaver mot noll.
+    //    while (difference > 6f)
+    //        difference -= 12f;
 
-        while (difference < -6f)
-            difference += 12f;
+    //    while (difference < -6f)
+    //        difference += 12f;
 
-        return Mathf.Abs(difference) <= tolerance;
-    }
+    //    return Mathf.Abs(difference) <= tolerance;
+    //}
     public static TargetNote GetCurrentNote(float songTime)
     {
         foreach (TargetNote note in Notes)

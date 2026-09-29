@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private MicrophoneInput microphoneInput;
     [SerializeField] private AudioSource songAudioSource;
 
-    [SerializeField, Range(0f, 1f)] private float pitchTolerance = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float pitchTolerance = 0.5f;
 
     [Header("Scoring")]
     [SerializeField] private TMP_Text scoreText;
@@ -63,6 +63,11 @@ public class GameController : MonoBehaviour
         CurrentMidi = float.NaN;
         CurrentTarget = SongNotes.GetCurrentNote(SongTime);
 
+        if (CurrentTarget == null)
+        {
+            return;
+        }
+
         if (!songAudioSource.isPlaying)
         {
             IsPlaying = false;
@@ -79,7 +84,8 @@ public class GameController : MonoBehaviour
         HasPitch = true;
         CurrentMidi = FrequencyToPitch.ConvertedPitch(detectedHz);
 
-        OnPitch = SongNotes.CheckPitch(CurrentTarget, CurrentMidi, pitchTolerance);
+        //OnPitch = SongNotes.CheckPitch(CurrentTarget, CurrentMidi, pitchTolerance);
+        OnPitch = (PitchScoring.CalculateAccuracyFromMidi(CurrentMidi,CurrentTarget.targetMidi, pitchTolerance) > 0f);
 
         UpdateScore();
 
@@ -114,7 +120,7 @@ public class GameController : MonoBehaviour
 
     private void UpdateScoreUI()
     {
-        if (scoreText != null)
+        if (scoreText != null)  
         {
             scoreText.text = $"Score: {Mathf.RoundToInt(Score)}";
         }
