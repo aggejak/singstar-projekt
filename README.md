@@ -1,6 +1,6 @@
 # singstar-projekt
 
-Group project in TFYA65 Ljudfysik. A singstar-like game with pitch detection and score based on accuracy.
+Grupprojekt inom kursen TFYA64 Ljudfysik. Ett singstar-liknande spel med pitch detektion och poäng som ges ut baserat på pitch.
 
 ## Överenskommelse: mikrofon → pitchdetektor
 
