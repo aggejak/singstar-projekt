@@ -14,6 +14,7 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
     [SerializeField] private TMP_Text frequencyText; // text som visar upptäckt frekvens
     [SerializeField] private TMP_Text pitchText; // text som visar upptäckt tonläge
     [SerializeField] private TMP_Dropdown microphoneDropdown;
+    [SerializeField] private PitchAnalyzer pitchAnalyzer; // SKickar analys till eget script
 
     private string[] availableMicrophones;
     
@@ -23,17 +24,13 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
 
     //
 
-    private PitchDetection pitchDetection;
     private float[] monoSamples;
-    public float CurrentPitchHz
-    {
-        get;
-        private set;
-    }
+    public float CurrentPitchHz => pitchAnalyzer.CurrentPitchHz;
 
     private void OnEnable()
     {
-        pitchDetection = new PitchDetection();
+        if (availableMicrophones != null)
+            return;
 
         // kolla att dropdownen är ansluten i Unity
         if (microphoneDropdown == null)
@@ -91,6 +88,8 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
         //inputLevel = 0f;
         previousPosition = 0;
         capturedFrames = 0;
+
+        pitchAnalyzer.ResetAnalysis();
 
         microphoneName = availableMicrophones[deviceIndex];
 
@@ -158,7 +157,7 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
             monoSamples[frame] = sum / channels;
         }
 
-        CurrentPitchHz = pitchDetection.DetectPitch(monoSamples, microphoneClip.frequency);
+        pitchAnalyzer.Analyze(monoSamples, microphoneClip.frequency);
 
         Debug.Log(
             "Upptäckt pitch: " +
@@ -166,7 +165,7 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
             " Hz"
         );
 
-        if (frequencyText != null)
+        if (frequencyText != null && pitchText != null)
         {
             if (CurrentPitchHz > 0)
             {
@@ -201,6 +200,6 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
         }
 
         //inputLevel = 0f;
-        CurrentPitchHz = 0f;
+        pitchAnalyzer.ResetAnalysis();
     }
 }

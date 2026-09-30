@@ -26,13 +26,22 @@ public static class PitchScoring
         }
 
         float absDifference = Mathf.Abs(difference);
+        const float zeroPointsAt = 1.0f;
 
-        if (absDifference > tolerance)
+        // Full poäng inom toleransen.
+        if (absDifference <= tolerance)
+        {
+            return 1f;
+        }
+
+        // Noll poäng från en halvtons avstånd på 1,0.
+        if (absDifference >= zeroPointsAt)
         {
             return 0f;
         }
 
-        // 1 = perfekt träff, 0 = utanför tolerans
-        return 1f - (absDifference / tolerance);
+        // Linjär minskning mellan toleransen och yttergränsen.
+        return 1f - (absDifference - tolerance)
+                   / (zeroPointsAt - tolerance);
     }
 }

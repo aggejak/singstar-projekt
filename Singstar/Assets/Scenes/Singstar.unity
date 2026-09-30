@@ -151,6 +151,9 @@ Transform:
   - {fileID: 1482381128}
   - {fileID: 1978980381}
   - {fileID: 73423352}
+  - {fileID: 566775877}
+  - {fileID: 89807282}
+  - {fileID: 1523453163}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &73423351
@@ -201,9 +204,58 @@ MonoBehaviour:
   gameView: {fileID: 1929863283}
   microphoneInput: {fileID: 1482381127}
   songAudioSource: {fileID: 1978980380}
+  pitchLogger: {fileID: 566775878}
+  pitchAnalyzer: {fileID: 89807281}
   pitchTolerance: 0.5
   scoreText: {fileID: 1748968563}
   maxPointsPerSecond: 100
+  inputMode: 0
+  audioFileInput: {fileID: 0}
+--- !u!1 &89807280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 89807282}
+  - component: {fileID: 89807281}
+  m_Layer: 0
+  m_Name: PitchAnalyzer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &89807281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89807280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf98c4ad7bdcd8f48a3ed526c5ddb3b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PitchAnalyzer
+  pitchLogger: {fileID: 566775878}
+--- !u!4 &89807282
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89807280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 23528974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &170628092
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,6 +1001,51 @@ Transform:
   - {fileID: 230306265}
   m_Father: {fileID: 434172912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &566775876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 566775877}
+  - component: {fileID: 566775878}
+  m_Layer: 0
+  m_Name: PitchLogger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &566775877
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566775876}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 23528974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &566775878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566775876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dc12339ccb10d848bb44cdac399694e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PitchLogger
+  songAudioSource: {fileID: 1978980380}
 --- !u!1 &644402224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1773,6 +1870,7 @@ MonoBehaviour:
   frequencyText: {fileID: 1950761670}
   pitchText: {fileID: 1302253666}
   microphoneDropdown: {fileID: 1450688322}
+  pitchAnalyzer: {fileID: 89807281}
 --- !u!4 &1482381128
 Transform:
   m_ObjectHideFlags: 0
@@ -1788,6 +1886,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 23528974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1523453162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1523453163}
+  - component: {fileID: 1523453164}
+  m_Layer: 0
+  m_Name: AudioFile
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1523453163
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523453162}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 23528974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1523453164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523453162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a892a08696279e4cb3dd96f2d35ec50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioFileInput
+  referenceClip: {fileID: 8300000, guid: b16dc94969e8dcf49bb00c72c890e78f, type: 3}
+  songAudioSource: {fileID: 1978980380}
+  pitchAnalyzer: {fileID: 89807281}
 --- !u!1 &1648270635
 GameObject:
   m_ObjectHideFlags: 0

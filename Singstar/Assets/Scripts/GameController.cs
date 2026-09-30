@@ -7,8 +7,18 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject gameView;
     [SerializeField] private MicrophoneInput microphoneInput;
     [SerializeField] private AudioSource songAudioSource;
+    [SerializeField] private PitchLogger pitchLogger;
+    [SerializeField] private PitchAnalyzer pitchAnalyzer;
 
-    [SerializeField, Range(0f, 1f)] private float pitchTolerance = 0.5f;
+    [SerializeField, Range(0f, 0.9f)] private float pitchTolerance = 0.5f;
+    public enum InputMode
+    {
+        Microphone,
+        AudioFile
+    }
+
+    [SerializeField] private InputMode inputMode;
+    [SerializeField] private AudioFileInput audioFileInput;
 
     [Header("Scoring")]
     [SerializeField] private TMP_Text scoreText;
@@ -32,9 +42,23 @@ public class GameController : MonoBehaviour
 
     public void StartGame()
     {
-        bool microphoneStarted = microphoneInput.StartSelectedMicrophone();
+        // Stoppa eventuell tidigare källa innan en ny startas.
+        audioFileInput.StopInput();
+        microphoneInput.enabled = false;
 
-        if (!microphoneStarted)
+        bool inputStarted;
+
+        if (inputMode == InputMode.Microphone)
+        {
+            microphoneInput.enabled = true;
+            inputStarted = microphoneInput.StartSelectedMicrophone();
+        }
+        else
+        {
+            inputStarted = audioFileInput.StartInput();
+        }
+
+        if (!inputStarted)
         {
             return;
         }
@@ -43,6 +67,9 @@ public class GameController : MonoBehaviour
         gameView.SetActive(true);
 
         songAudioSource.time = 0f;
+
+        pitchLogger.BeginRecording(); // Spara ljudsamples
+
         songAudioSource.Play();
 
         Score = 0f;
@@ -63,18 +90,17 @@ public class GameController : MonoBehaviour
         CurrentMidi = float.NaN;
         CurrentTarget = SongNotes.GetCurrentNote(SongTime);
 
-        if (CurrentTarget == null)
-        {
-            return;
-        }
-
         if (!songAudioSource.isPlaying)
         {
+            audioFileInput.StopInput();
+            microphoneInput.enabled = false;
+
+            pitchLogger.SaveRecording();
             IsPlaying = false;
             return;
         }
 
-        float detectedHz = microphoneInput.CurrentPitchHz;
+        float detectedHz = pitchAnalyzer.CurrentPitchHz;
 
         if (detectedHz <= 0f || float.IsNaN(detectedHz) || float.IsInfinity(detectedHz))
         {
@@ -82,10 +108,21 @@ public class GameController : MonoBehaviour
         }
 
         HasPitch = true;
+
         CurrentMidi = FrequencyToPitch.ConvertedPitch(detectedHz);
 
+
+
+
         //OnPitch = SongNotes.CheckPitch(CurrentTarget, CurrentMidi, pitchTolerance);
-        OnPitch = (PitchScoring.CalculateAccuracyFromMidi(CurrentMidi,CurrentTarget.targetMidi, pitchTolerance) > 0f);
+
+
+        OnPitch = CurrentTarget != null &&
+            PitchScoring.CalculateAccuracyFromMidi(
+                CurrentMidi,
+                CurrentTarget.targetMidi,
+                pitchTolerance
+            ) > 0f;
 
         UpdateScore();
 
