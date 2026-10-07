@@ -5,56 +5,87 @@ using UnityEngine.UI;
 public class PitchVisualizer : MonoBehaviour
 {
     [SerializeField] private GameController gameController;
-
-    // Den gamla TargetLine används nu som mall för tonstaplarna.
     [SerializeField] private RectTransform targetLine;
-
     [SerializeField] private RectTransform playerMarker;
     [SerializeField] private Image playerImage;
-
-    // Tonhöjd
-    [SerializeField] private float centerMidi = 60f;
-    [SerializeField] private float pixelsPerSemitone = 20f;
     [SerializeField] private RectTransform playheadLine;
 
-    // Tidslinje
-    [SerializeField] private float pixelsPerSecond = 100f;
+    [Header("Fast notgrupp")]
+    [SerializeField, Min(0f)] private float horizontalPadding = 40f;
+    [SerializeField, Min(0f)] private float verticalPadding = 36f;
+    [SerializeField, Min(1f)] private float pixelsPerSemitone = 20f;
+    [SerializeField, Min(1f)] private float barHeight = 12f;
 
-    // X-positionen där tonen ska sjungas NU.
-    [SerializeField] private float playheadX = -250f;
+    [Header("Pitchfeedback")]
+    [SerializeField] private Color noteColor = new Color(0.72f, 0.79f, 0.9f, 1f);
+    [SerializeField] private Color activeNoteColor = new Color(1f, 0.9f, 0.55f, 1f);
+    [SerializeField] private Color hitColor = new Color(0.3f, 1f, 0.55f, 1f);
+    [SerializeField] private Color offPitchColor = new Color(1f, 0.4f, 0.4f, 1f);
 
-    // Hur mycket av tidslinjen som visas.
-    [SerializeField] private float visibleFutureSeconds = 10f;
-    [SerializeField] private float visiblePastSeconds = 1f;
-
-    private readonly List<RectTransform> noteBars =
-        new List<RectTransform>();
+    private readonly List<Image> noteBars = new List<Image>();
+    private readonly List<Outline> noteGlows = new List<Outline>();
+    private RectTransform pitchArea;
+    private TargetNoteGroup currentGroup;
+    private Outline markerGlow;
+    private Vector2 layoutSize;
+    private float groupCenterMidi;
+    private float pitchScale;
+    private float timelineWidth;
+    private float markerYLimit;
+    private Vector3 markerBaseScale;
 
     private void Start()
     {
-        CreateNoteBars();
+        pitchArea = targetLine.parent as RectTransform;
+        markerBaseScale = playerMarker.localScale;
+        SetCenteredAnchors(playerMarker);
+        playerImage.raycastTarget = false;
+        markerGlow = AddGlow(playerImage);
 
-        // Originalet används bara som mall och ska inte själv visas.
+        // Den gamla linjen är endast en mall. Kvadraten visar nu tiden.
         targetLine.gameObject.SetActive(false);
-         Vector2 linePosition = playheadLine.anchoredPosition;
-    linePosition.x = playheadX;
-    playheadLine.anchoredPosition = linePosition;
+        if (playheadLine != null)
+        {
+            playheadLine.gameObject.SetActive(false);
+        }
+
+        int maxNotes = 0;
+        foreach (TargetNoteGroup group in SongNotes.Groups)
+        {
+            maxNotes = Mathf.Max(maxNotes, group.Notes.Length);
+        }
+
+        // Återanvänd samma staplar vid gruppbyten.
+        for (int i = 0; i < maxNotes; i++)
+        {
+            RectTransform bar = Instantiate(targetLine, pitchArea);
+            bar.name = $"GroupNote_{i + 1}";
+            SetCenteredAnchors(bar);
+            Image barImage = bar.GetComponent<Image>();
+            barImage.raycastTarget = false;
+            noteBars.Add(barImage);
+            noteGlows.Add(AddGlow(barImage));
+        }
+
+        playerMarker.SetAsLastSibling();
+        HideEverything();
     }
 
-    private void CreateNoteBars()
+    private static void SetCenteredAnchors(RectTransform rect)
     {
-        foreach (TargetNote note in SongNotes.Notes)
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+    }
+
+    private static Outline AddGlow(Image image)
+    {
+        Outline glow = image.GetComponent<Outline>();
+        if (glow == null)
         {
-            RectTransform bar =
-                Instantiate(targetLine, targetLine.parent);
-
-            bar.name =
-                $"Note_{note.startTime:F2}_{note.targetMidi:F0}";
-
-            bar.gameObject.SetActive(false);
-
-            noteBars.Add(bar);
+            glow = image.gameObject.AddComponent<Outline>();
         }
+        glow.effectDistance = new Vector2(3f, -3f);
+        glow.enabled = false;
+        return glow;
     }
 
     private void LateUpdate()
@@ -66,128 +97,145 @@ public class PitchVisualizer : MonoBehaviour
         }
 
         float songTime = gameController.SongTime;
+        TargetNoteGroup group = SongNotes.GetCurrentGroup(songTime);
+        if (group == null)
+        {
+            // Inga kvarvarande staplar under intro, pauser eller efter sista tonen.
+            HideEverything();
+            return;
+        }
 
-        UpdateNoteBars(songTime);
-        UpdatePlayerMarker();
+        if (group != currentGroup || layoutSize != pitchArea.rect.size)
+        {
+            currentGroup = group;
+            LayoutGroup();
+        }
+
+        TargetNote target = SongNotes.GetCurrentNote(songTime);
+        bool hasPitch = gameController.HasPitch &&
+            !float.IsNaN(gameController.CurrentMidi) &&
+            !float.IsInfinity(gameController.CurrentMidi);
+        bool hit = hasPitch && target != null && gameController.OnPitch;
+        float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 12f);
+
+        UpdateNoteFeedback(songTime, target, hit, pulse);
+        UpdatePlayerMarker(songTime, target, hasPitch, hit, pulse);
     }
 
-    private void UpdateNoteBars(float songTime)
+    private void LayoutGroup()
     {
-        for (int i = 0; i < SongNotes.Notes.Length; i++)
+        layoutSize = pitchArea.rect.size;
+        timelineWidth = Mathf.Max(1f, layoutSize.x - 2f * horizontalPadding);
+        float usableHeight = Mathf.Max(1f, layoutSize.y - 2f * verticalPadding);
+        markerYLimit = Mathf.Max(0f, (layoutSize.y - playerMarker.rect.height) * 0.5f - 8f);
+
+        float minMidi = currentGroup.Notes[0].targetMidi;
+        float maxMidi = minMidi;
+        foreach (TargetNote note in currentGroup.Notes)
         {
-            TargetNote note = SongNotes.Notes[i];
-            RectTransform bar = noteBars[i];
+            minMidi = Mathf.Min(minMidi, note.targetMidi);
+            maxMidi = Mathf.Max(maxMidi, note.targetMidi);
+        }
 
-            // Visa bara toner som ligger nära den aktuella tiden.
-            bool visible =
-                note.endTime >= songTime - visiblePastSeconds &&
-                note.startTime <= songTime + visibleFutureSeconds;
+        // Centrera hela tonomfånget, med luft för spelarens pitch ovanför/under.
+        // Skalan ändras bara vid gruppbyte eller när fönstret ändrar storlek.
+        groupCenterMidi = (minMidi + maxMidi) * 0.5f;
+        pitchScale = Mathf.Min(pixelsPerSemitone,
+            Mathf.Max(1f, usableHeight - barHeight) / (maxMidi - minMidi + 4f));
 
-            bar.gameObject.SetActive(visible);
-
+        for (int i = 0; i < noteBars.Count; i++)
+        {
+            bool visible = i < currentGroup.Notes.Length;
+            noteBars[i].gameObject.SetActive(visible);
+            noteGlows[i].enabled = false;
             if (!visible)
             {
                 continue;
             }
 
-            // Tonens mittpunkt i tiden.
-            float middleTime =
-                (note.startTime + note.endTime) / 2f;
-
-            // Flytta tonen åt vänster när tiden går.
-            float x =
-                playheadX +
-                (middleTime - songTime) * pixelsPerSecond;
-
-            // Tonhöjd bestämmer Y-position.
-            float y =
-                (note.targetMidi - centerMidi) *
-                pixelsPerSemitone;
-
-            bar.anchoredPosition =
-                new Vector2(x, y);
-
-            // Tonens längd bestämmer stapelns bredd.
-            float duration =
-                note.endTime - note.startTime;
-
-            Vector2 size = bar.sizeDelta;
-
-            size.x =
-                Mathf.Max(4f, duration * pixelsPerSecond);
-
-            bar.sizeDelta = size;
+            TargetNote note = currentGroup.Notes[i];
+            float startX = TimeToX(note.startTime);
+            float endX = TimeToX(note.endTime);
+            RectTransform bar = noteBars[i].rectTransform;
+            bar.anchoredPosition = new Vector2((startX + endX) * 0.5f, MidiToY(note.targetMidi));
+            // En liten springa skiljer även två intilliggande toner på samma höjd.
+            float gap = Mathf.Min(3f, (endX - startX) * 0.15f);
+            bar.sizeDelta = new Vector2(endX - startX - gap, barHeight);
+            noteBars[i].color = noteColor;
         }
     }
 
-    private void UpdatePlayerMarker()
+    private float TimeToX(float songTime)
     {
-        playerMarker.gameObject.SetActive(false);
+        float progress = Mathf.InverseLerp(currentGroup.StartTime, currentGroup.EndTime, songTime);
+        return (progress - 0.5f) * timelineWidth;
+    }
 
-        if (!gameController.HasPitch)
+    private float MidiToY(float midi)
+    {
+        return (midi - groupCenterMidi) * pitchScale;
+    }
+
+    private void UpdateNoteFeedback(float songTime, TargetNote target, bool hit, float pulse)
+    {
+        for (int i = 0; i < currentGroup.Notes.Length; i++)
+        {
+            TargetNote note = currentGroup.Notes[i];
+            bool isCurrent = note == target;
+            Color color = isCurrent ? (hit ? hitColor : activeNoteColor) : noteColor;
+            if (songTime >= note.endTime)
+            {
+                color.a *= 0.45f;
+            }
+            noteBars[i].color = color;
+            noteGlows[i].enabled = isCurrent && hit;
+            noteGlows[i].effectColor = new Color(hitColor.r, hitColor.g, hitColor.b, 0.25f + pulse * 0.35f);
+        }
+    }
+
+    private void UpdatePlayerMarker(float songTime, TargetNote target, bool hasPitch, bool hit, float pulse)
+    {
+        playerMarker.gameObject.SetActive(hasPitch);
+        markerGlow.enabled = hit;
+        playerMarker.localScale = markerBaseScale * (hit ? 1f + pulse * 0.12f : 1f);
+        if (!hasPitch)
         {
             return;
         }
 
-        float displayedMidi =
-            gameController.CurrentMidi;
+        float referenceMidi = target != null ? target.targetMidi : groupCenterMidi;
+        float difference = gameController.CurrentMidi - referenceMidi;
+        // Samma oktavoberoende jämförelse som i poängräkningen.
+        while (difference > 6f) difference -= 12f;
+        while (difference < -6f) difference += 12f;
 
-        TargetNote currentTarget =
-            gameController.CurrentTarget;
-
-        if (currentTarget != null)
-        {
-            // Placera spelarens ton i närmaste oktav
-            // till måltonen.
-            float difference =
-                displayedMidi -
-                currentTarget.targetMidi;
-
-            while (difference > 6f)
-            {
-                difference -= 12f;
-            }
-
-            while (difference < -6f)
-            {
-                difference += 12f;
-            }
-
-            displayedMidi =
-                currentTarget.targetMidi +
-                difference;
-        }
-
-        playerMarker.gameObject.SetActive(true);
-
-        float y =
-            (displayedMidi - centerMidi) *
-            pixelsPerSemitone;
-
-        // Spelaren står kvar vid "nu"-positionen.
-        playerMarker.anchoredPosition =
-            new Vector2(playheadX, y);
-
-        if (currentTarget == null)
-        {
-            playerImage.color = Color.yellow;
-        }
-        else
-        {
-            playerImage.color =
-                gameController.OnPitch
-                    ? Color.green
-                    : Color.red;
-        }
+        float y = Mathf.Clamp(MidiToY(referenceMidi + difference), -markerYLimit, markerYLimit);
+        playerMarker.anchoredPosition = new Vector2(TimeToX(songTime), y);
+        playerImage.color = target == null ? activeNoteColor : (hit ? hitColor : offPitchColor);
+        markerGlow.effectColor = new Color(hitColor.r, hitColor.g, hitColor.b, 0.4f + pulse * 0.3f);
     }
 
     private void HideEverything()
     {
-        foreach (RectTransform bar in noteBars)
+        currentGroup = null;
+        foreach (Image bar in noteBars)
         {
             bar.gameObject.SetActive(false);
         }
-
         playerMarker.gameObject.SetActive(false);
+        playerMarker.localScale = markerBaseScale;
+        if (markerGlow != null)
+        {
+            markerGlow.enabled = false;
+        }
+    }
+
+    private void OnDisable()
+    {
+        // GameView kan döljas mellan två spelomgångar.
+        if (pitchArea != null)
+        {
+            HideEverything();
+        }
     }
 }

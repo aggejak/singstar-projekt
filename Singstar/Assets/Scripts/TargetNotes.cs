@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class TargetNote
 {
     public float startTime;
@@ -14,6 +12,18 @@ public class TargetNote
     }
 }
 
+public class TargetNoteGroup
+{
+    public readonly TargetNote[] Notes;
+    public float StartTime => Notes[0].startTime;
+    public float EndTime => Notes[Notes.Length - 1].endTime;
+
+    public TargetNoteGroup(params TargetNote[] notes)
+    {
+        Notes = notes;
+    }
+}
+
 public static class SongNotes
 {
     // MIDI-tonnummer
@@ -25,76 +35,96 @@ public static class SongNotes
     private const float E4 = 64f;
     private const float Fs4 = 66f;
     private const float G4 = 67f;
+    private const float B4 = 71f;
 
-    // Tider i sekunder frÂn ljudfilens bˆrjan.
-    // Ej uppm‰tta tider ‰r fortfarande uppskattningar.
-    public static readonly TargetNote[] Notes =
+    // Tider i sekunder fr√•n ljudfilens b√∂rjan.
+    // Varje grupp visas ensam fr√•n sin f√∂rsta tons start till sin sista tons slut.
+    public static readonly TargetNoteGroup[] Groups =
     {
-        // Fˆrsta refr‰ngen
-        new TargetNote(12.24f, 13.88f, B3),  // Stad
-        new TargetNote(13.88f, 15.56f, C4),  // i
-        new TargetNote(15.56f, 18.00f, D4),  // ljus
-        new TargetNote(18.00f, 18.44f, E4),  // i
-        new TargetNote(18.44f, 19.00f, Fs4), // ett
-        new TargetNote(19.00f, 20.67f, G4),  // land
-        new TargetNote(20.67f, 21.50f, C4),  // u-
-        new TargetNote(21.50f, 22.33f, B3),  // -tan
-        new TargetNote(22.33f, 24.83f, A3),  // namn
-
-        // Paus 24.83ñ25.67
-        new TargetNote(25.67f, 27.33f, B3),  // Ge
-        new TargetNote(27.33f, 29.00f, Fs4), // mig
-        new TargetNote(29.00f, 31.08f, G4),  // liv
-        new TargetNote(31.08f, 31.50f, G4),  // d‰r
-        new TargetNote(31.50f, 31.92f, E4),  // all-
-        new TargetNote(31.92f, 32.33f, C4),  // -ting
-        new TargetNote(32.33f, 34.00f, B3),  // fˆds
-        new TargetNote(34.00f, 35.67f, A3),  // pÂ
-        new TargetNote(35.67f, 39.00f, G3),  // nytt
-
-        // Andra refr‰ngen
-        new TargetNote(39.00f, 40.68f, B3),  // Stad
-        new TargetNote(40.68f, 42.36f, C4),  // i
-        new TargetNote(42.36f, 44.88f, D4),  // ljus
-        new TargetNote(44.88f, 45.30f, E4),  // i
-        new TargetNote(45.30f, 45.72f, Fs4), // ett
-        new TargetNote(45.72f, 47.40f, G4),  // land
-        new TargetNote(47.40f, 48.24f, C4),  // u-
-        new TargetNote(48.24f, 49.08f, B3),  // -tan
-        new TargetNote(49.08f, 51.60f, A3),  // namn
-
-        // Paus 51.60ñ52.44
-        new TargetNote(52.44f, 54.12f, B3),  // Ge
-        new TargetNote(54.12f, 55.80f, Fs4), // mig
-        new TargetNote(55.80f, 57.90f, G4),  // liv
-        new TargetNote(57.90f, 58.32f, G4),  // d‰r
-        new TargetNote(58.32f, 58.74f, E4),  // all-
-        new TargetNote(58.74f, 59.16f, C4),  // -ting
-        new TargetNote(59.16f, 60.84f, D4),  // fˆds
-        new TargetNote(60.84f, 62.52f, Fs4), // pÂ
-        new TargetNote(62.52f, 67.28f, G4),  // nytt
+        // F√∂rsta refr√§ngen
+        new TargetNoteGroup(
+            new TargetNote(12.24f, 13.88f, B3),  // Stad
+            new TargetNote(13.88f, 15.56f, C4),  // i
+            new TargetNote(15.56f, 18.00f, D4)   // ljus
+        ),
+        new TargetNoteGroup(
+            new TargetNote(18.00f, 18.44f, E4),  // i
+            new TargetNote(18.44f, 19.00f, Fs4), // ett
+            new TargetNote(19.00f, 20.67f, G4),  // land
+            new TargetNote(20.67f, 21.50f, C4),  // u-
+            new TargetNote(21.50f, 22.33f, B3),  // -tan
+            new TargetNote(22.33f, 24.83f, A3)   // namn
+        ),
+        // Paus 24.83‚Äì25.67
+        new TargetNoteGroup(
+            new TargetNote(25.67f, 27.33f, B3),  // Ge
+            new TargetNote(27.33f, 29.00f, Fs4), // mig
+            new TargetNote(29.00f, 31.08f, G4)   // liv
+        ),
+        new TargetNoteGroup(
+            new TargetNote(31.08f, 31.50f, G4),  // d√§r
+            new TargetNote(31.50f, 31.92f, E4),  // all-
+            new TargetNote(31.92f, 32.33f, C4),  // -ting
+            new TargetNote(32.33f, 34.00f, B3),  // f√∂ds
+            new TargetNote(34.00f, 35.67f, A3),  // p√•
+            new TargetNote(35.67f, 39.00f, G3)   // nytt
+        ),
+        // Andra refr√§ngen
+        new TargetNoteGroup(
+            new TargetNote(39.00f, 40.68f, B3),  // Stad
+            new TargetNote(40.68f, 42.36f, C4),  // i
+            new TargetNote(42.36f, 44.88f, D4),  // ljus
+            new TargetNote(44.88f, 45.30f, E4)   // i
+        ),
+        new TargetNoteGroup(
+            new TargetNote(45.30f, 45.72f, Fs4), // ett
+            new TargetNote(45.72f, 47.40f, G4),  // land
+            new TargetNote(47.40f, 48.24f, C4),  // u-
+            new TargetNote(48.24f, 49.08f, B3),  // -tan
+            new TargetNote(49.08f, 51.60f, A3)   // namn
+        ),
+        // Paus 51.60‚Äì52.44
+        new TargetNoteGroup(
+            new TargetNote(52.44f, 53.28f, B3),  // Ge
+            new TargetNote(53.28f, 54.12f, B4),  // GEEE
+            new TargetNote(54.12f, 55.80f, Fs4), // mig
+            new TargetNote(55.80f, 57.90f, G4)   // liv
+        ),
+        new TargetNoteGroup(
+            new TargetNote(57.90f, 58.32f, G4),  // d√§r
+            new TargetNote(58.32f, 58.74f, E4),  // all-
+            new TargetNote(58.74f, 59.16f, C4),  // -ting
+            new TargetNote(59.16f, 60.84f, D4),  // f√∂ds
+            new TargetNote(60.84f, 62.52f, Fs4), // p√•
+            new TargetNote(62.52f, 67.28f, G4)   // nytt
+        )
     };
 
-    //public static bool CheckPitch(TargetNote target, float detectedMidi, float tolerance)
-    //{
-    //    if (target == null ||
-    //        float.IsNaN(detectedMidi) ||
-    //        float.IsInfinity(detectedMidi))
-    //    {
-    //        return false;
-    //    }
+    // Samma noter anv√§nds av po√§ngr√§kningen; tider och toner definieras bara ovan.
+    public static readonly TargetNote[] Notes = FlattenGroups();
 
-    //    float difference = detectedMidi - target.targetMidi;
+    private static TargetNote[] FlattenGroups()
+    {
+        var notes = new System.Collections.Generic.List<TargetNote>();
+        foreach (TargetNoteGroup group in Groups)
+        {
+            notes.AddRange(group.Notes);
+        }
+        return notes.ToArray();
+    }
 
-    //    // Flytta skillnaden hela oktaver mot noll.
-    //    while (difference > 6f)
-    //        difference -= 12f;
+    public static TargetNoteGroup GetCurrentGroup(float songTime)
+    {
+        foreach (TargetNoteGroup group in Groups)
+        {
+            if (songTime >= group.StartTime && songTime < group.EndTime)
+            {
+                return group;
+            }
+        }
+        return null;
+    }
 
-    //    while (difference < -6f)
-    //        difference += 12f;
-
-    //    return Mathf.Abs(difference) <= tolerance;
-    //}
     public static TargetNote GetCurrentNote(float songTime)
     {
         foreach (TargetNote note in Notes)
@@ -104,7 +134,6 @@ public static class SongNotes
                 return note;
             }
         }
-
         return null;
     }
 }
