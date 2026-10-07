@@ -198,26 +198,75 @@ public class PitchVisualizer : MonoBehaviour
         }
     }
 
-    private void UpdatePlayerMarker(float songTime, TargetNote target, bool hasPitch, bool hit, float pulse)
+    private void UpdatePlayerMarker(
+        float songTime,
+        TargetNote target,
+        bool hasPitch,
+        bool hit,
+        float pulse)
     {
         playerMarker.gameObject.SetActive(hasPitch);
         markerGlow.enabled = hit;
-        playerMarker.localScale = markerBaseScale * (hit ? 1f + pulse * 0.12f : 1f);
+
+        // Behåll samma storlek så markören inte pulserar.
+        playerMarker.localScale = markerBaseScale;
+
         if (!hasPitch)
         {
             return;
         }
 
-        float referenceMidi = target != null ? target.targetMidi : groupCenterMidi;
-        float difference = gameController.CurrentMidi - referenceMidi;
-        // Samma oktavoberoende jämförelse som i poängräkningen.
-        while (difference > 6f) difference -= 12f;
-        while (difference < -6f) difference += 12f;
+        float referenceMidi = target != null
+            ? target.targetMidi
+            : groupCenterMidi;
 
-        float y = Mathf.Clamp(MidiToY(referenceMidi + difference), -markerYLimit, markerYLimit);
-        playerMarker.anchoredPosition = new Vector2(TimeToX(songTime), y);
-        playerImage.color = target == null ? activeNoteColor : (hit ? hitColor : offPitchColor);
-        markerGlow.effectColor = new Color(hitColor.r, hitColor.g, hitColor.b, 0.4f + pulse * 0.3f);
+        float difference = PitchScoring.GetPitchDifference(
+            gameController.CurrentMidi,
+            referenceMidi
+        );
+
+        float displayMidi;
+
+        if (hit)
+        {
+            // Vid träff: exakt samma höjd som målbaren.
+            displayMidi = target.targetMidi;
+        }
+        else
+        {
+            // Annars: hoppa mellan hela halvtonssteg.
+            displayMidi = Mathf.Round(referenceMidi + difference);
+
+            // Visa inte markören på måltonen när vi faktiskt missar.
+            // Kan annars hända om toleransen är mindre än 0.5.
+            if (target != null &&
+                Mathf.Approximately(displayMidi, target.targetMidi))
+            {
+                displayMidi = target.targetMidi + Mathf.Sign(difference);
+            }
+        }
+
+        float y = Mathf.Clamp(
+            MidiToY(displayMidi),
+            -markerYLimit,
+            markerYLimit
+        );
+
+        playerMarker.anchoredPosition = new Vector2(
+            TimeToX(songTime),
+            y
+        );
+
+        playerImage.color = target == null
+            ? activeNoteColor
+            : (hit ? hitColor : offPitchColor);
+
+        markerGlow.effectColor = new Color(
+            hitColor.r,
+            hitColor.g,
+            hitColor.b,
+            0.4f + pulse * 0.3f
+        );
     }
 
     private void HideEverything()

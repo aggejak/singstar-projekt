@@ -2,27 +2,35 @@ using UnityEngine;
 
 public static class PitchScoring
 {
+    public static float GetPitchDifference(
+        float detectedMidi,
+        float targetMidi)
+    {
+        if (float.IsNaN(detectedMidi) || float.IsInfinity(detectedMidi) ||
+            float.IsNaN(targetMidi) || float.IsInfinity(targetMidi))
+        {
+            return float.NaN;
+        }
+
+        float difference = detectedMidi - targetMidi;
+
+        // Flytta skillnaden till närmaste oktav.
+        while (difference > 6f) difference -= 12f;
+        while (difference < -6f) difference += 12f;
+
+        return difference;
+    }
+
     public static float CalculateAccuracyFromMidi(
         float detectedMidi,
         float targetMidi,
         float tolerance)
     {
-        if (float.IsNaN(detectedMidi) || float.IsInfinity(detectedMidi))
+        float difference = GetPitchDifference(detectedMidi, targetMidi);
+
+        if (float.IsNaN(difference))
         {
             return 0f;
-        }
-
-        float difference = detectedMidi - targetMidi;
-
-        // Flytta skillnaden till närmaste oktav
-        while (difference > 6f)
-        {
-            difference -= 12f;
-        }
-
-        while (difference < -6f)
-        {
-            difference += 12f;
         }
 
         float absDifference = Mathf.Abs(difference);
@@ -34,13 +42,13 @@ public static class PitchScoring
             return 1f;
         }
 
-        // Noll poäng från en halvtons avstånd på 1,0.
+        // Noll poäng vid minst en halvtons avvikelse.
         if (absDifference >= zeroPointsAt)
         {
             return 0f;
         }
 
-        // Linjär minskning mellan toleransen och yttergränsen.
+        // Linjär minskning däremellan.
         return 1f - (absDifference - tolerance)
                    / (zeroPointsAt - tolerance);
     }

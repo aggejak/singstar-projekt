@@ -8,7 +8,7 @@ public class TargetNote
     {
         this.startTime = startTime;
         this.endTime = endTime;
-        this.targetMidi = targetMidi;
+        this.targetMidi = targetMidi + SongNotes.PitchOffset;
     }
 }
 
@@ -52,6 +52,9 @@ public class TargetNoteGroup
 
 public static class SongNotes
 {
+    // Kalibrering för låten, i halvtoner.
+    public const float PitchOffset = 0.4f;
+
     // MIDI-tonnummer
     private const float G3 = 55f;
     private const float A3 = 57f;

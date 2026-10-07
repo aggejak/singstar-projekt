@@ -117,12 +117,15 @@ public class GameController : MonoBehaviour
         //OnPitch = SongNotes.CheckPitch(CurrentTarget, CurrentMidi, pitchTolerance);
 
 
-        OnPitch = CurrentTarget != null &&
-            PitchScoring.CalculateAccuracyFromMidi(
+        if (CurrentTarget != null)
+        {
+            float difference = PitchScoring.GetPitchDifference(
                 CurrentMidi,
-                CurrentTarget.targetMidi,
-                pitchTolerance
-            ) > 0f;
+                CurrentTarget.targetMidi
+            );
+
+            OnPitch = Mathf.Abs(difference) <= pitchTolerance;
+        }
 
         UpdateScore();
 
