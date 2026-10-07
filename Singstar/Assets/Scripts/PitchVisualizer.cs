@@ -97,7 +97,7 @@ public class PitchVisualizer : MonoBehaviour
         }
 
         float songTime = gameController.SongTime;
-        TargetNoteGroup group = SongNotes.GetCurrentGroup(songTime);
+        TargetNoteGroup group = SongNotes.GetDisplayGroup(songTime);
         if (group == null)
         {
             // Inga kvarvarande staplar under intro, pauser eller efter sista tonen.
@@ -167,7 +167,12 @@ public class PitchVisualizer : MonoBehaviour
 
     private float TimeToX(float songTime)
     {
-        float progress = Mathf.InverseLerp(currentGroup.StartTime, currentGroup.EndTime, songTime);
+        float progress = Mathf.InverseLerp(
+            currentGroup.DisplayStartTime,
+            currentGroup.DisplayEndTime,
+            songTime
+        );
+
         return (progress - 0.5f) * timelineWidth;
     }
 
