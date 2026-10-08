@@ -207,10 +207,11 @@ MonoBehaviour:
   pitchLogger: {fileID: 566775878}
   pitchAnalyzer: {fileID: 89807281}
   pitchTolerance: 0.5
-  inputMode: 1
+  inputMode: 0
   audioFileInput: {fileID: 1523453164}
   scoreText: {fileID: 1748968563}
   maxPointsPerSecond: 100
+  creatorNames: Axel, Nils, Ahmad
 --- !u!1 &89807280
 GameObject:
   m_ObjectHideFlags: 0
