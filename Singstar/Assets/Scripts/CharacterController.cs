@@ -10,8 +10,32 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private Sprite singingSprite;
     [SerializeField] private Sprite sadSprite;
     // delay innan bild ändras
-    [SerializeField, Min(0f)] private float confirmationTime = 0.5f; // hur länge måste on ton hållas innan tommy byter
+    // hur länge måste on ton hållas innan tommy byter
+    [SerializeField, Min(0f)] private float singingDelay = 0f;
+    [SerializeField, Min(0f)] private float sadDelay = 0.5f;
     [SerializeField, Min(0f)] private float neutralDelay = 0.5f;
+
+    // färger till glow
+    [SerializeField]
+    private Color singingGlow =
+        new Color(0.3f, 1f, 0.55f, 1f);
+    [SerializeField]
+    private Color sadGlow =
+        new Color(1f, 0.4f, 0.4f, 1f);
+
+    // glow
+    [SerializeField] private Image glowImage;
+
+    [SerializeField] private float pulseSpeed = 1.5f;
+    [SerializeField] private float minGlowRadius = 8f;
+    [SerializeField] private float maxGlowRadius = 40f;
+
+    [SerializeField, Range(0f, 1f)]
+    private float maxGlowStrength = 0.8f;
+
+    private Material glowMaterial;
+
+    //
 
     private enum Emotion { Neutral, Singing, Sad }
 
@@ -28,11 +52,31 @@ public class CharacterController : MonoBehaviour
         characterImage = GetComponent<Image>();
         characterImage.preserveAspect = true;
         characterImage.raycastTarget = false;
+
+        if (glowImage != null && glowImage.material != null)
+        {
+            // Create an independent material instance.
+            glowMaterial = new Material(glowImage.material);
+            glowImage.material = glowMaterial;
+            glowImage.raycastTarget = false;
+            glowImage.enabled = false;
+        }
     }
 
     private void OnEnable()
     {
         ResetToNeutral(); // starta neutralt
+    }
+
+    private void OnDestroy()
+    {
+        if (glowMaterial != null)
+            Destroy(glowMaterial);
+    }
+
+    private void Update()
+    {
+        UpdateGlow();
     }
 
     private void LateUpdate()
@@ -94,9 +138,14 @@ public class CharacterController : MonoBehaviour
             pendingSince = now;   // starta om tiden för bekräftelsen
         }
 
-        if (now - pendingSince >= confirmationTime) // resultatet har hållit i sig tillräckligt länge
+        // resultatet har hållit i sig tillräckligt länge
+        float requiredDelay = wanted == Emotion.Singing
+            ? singingDelay
+            : sadDelay;
+
+        if (now - pendingSince >= requiredDelay)
         {
-            SetEmotion(wanted); // byt uttryck
+            SetEmotion(wanted);
         }
     }
 
@@ -133,5 +182,54 @@ public class CharacterController : MonoBehaviour
 
         if (characterImage.sprite != sprite)
             characterImage.sprite = sprite;
+
+        if (glowImage != null)
+        {
+            // Keep the glow silhouette synchronized with Tommy.
+            if (glowImage.sprite != sprite)
+                glowImage.sprite = sprite;
+
+            glowImage.enabled = emotion != Emotion.Neutral;
+        }
     }
+
+
+    private void UpdateGlow()
+    {
+        if (glowMaterial == null || glowImage == null)
+            return;
+
+        if (currentEmotion == Emotion.Neutral)
+        {
+            glowImage.enabled = false;
+            return;
+        }
+
+        glowImage.enabled = true;
+
+        // Progress from 0 to 1 repeatedly.
+        float progress = Mathf.Repeat(
+            Time.time * pulseSpeed, 1f
+        );
+
+        // Glow expands gradually.
+        float radius = Mathf.Lerp(
+            minGlowRadius,
+            maxGlowRadius,
+            progress
+        );
+
+        // Glow fades as it expands.
+        float strength = maxGlowStrength *
+            Mathf.Pow(1f - progress, 1.5f);
+
+        Color color = currentEmotion == Emotion.Singing
+            ? singingGlow
+            : sadGlow;
+
+        glowMaterial.SetColor("_GlowColor", color);
+        glowMaterial.SetFloat("_Radius", radius);
+        glowMaterial.SetFloat("_Strength", strength);
+    }
+
 }
