@@ -26,12 +26,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private float maxPointsPerSecond = 100f;
 
     [Header("Slutskärm")]
-    [SerializeField] private string creatorNames = "Axel, Nils, Ahmad";
-
-    private GameObject resultView;
-    private TMP_Text resultScoreText;
-    private TMP_Text resultCreatorsText;
-    private Button replayButton;
+    [SerializeField] private GameObject resultView;
+    [SerializeField] private TMP_Text resultScoreText;
+    [SerializeField] private Button replayButton;
 
     public bool IsPlaying { get; private set; }
     public bool HasPitch { get; private set; }
@@ -44,6 +41,11 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        // Slutskärmen kan vara aktiverad i editorn när layouten redigeras.
+        if (resultView != null)
+        {
+            resultView.SetActive(false);
+        }
         startMenu.SetActive(true);
         gameView.SetActive(false);
         UpdateScoreUI();
@@ -183,95 +185,20 @@ public class GameController : MonoBehaviour
 
     private void ShowResults()
     {
-        if (resultView == null)
+        if (resultView == null || resultScoreText == null || replayButton == null)
         {
-            // Skapas under samma Canvas utan nya Inspector-kopplingar.
-            resultView = new GameObject(
-                "ResultView", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            resultView.transform.SetParent(gameView.transform.parent, false);
-            resultView.layer = gameView.transform.parent.gameObject.layer;
-
-            RectTransform panel = resultView.GetComponent<RectTransform>();
-            panel.anchorMin = Vector2.zero;
-            panel.anchorMax = Vector2.one;
-            panel.offsetMin = Vector2.zero;
-            panel.offsetMax = Vector2.zero;
-            resultView.GetComponent<Image>().color = new Color(0.04f, 0.04f, 0.08f, 1f);
-
-            TMP_Text heading = CreateResultText("Heading", 0.62f, 0.75f, 52f);
-            heading.text = "Din poäng";
-            resultScoreText = CreateResultText("FinalScore", 0.43f, 0.62f, 100f);
-            resultScoreText.color = new Color(0.3f, 1f, 0.55f, 1f);
-
-            //TMP_Text creditsHeading = CreateResultText("CreditsHeading", 0.29f, 0.38f, 30f);
-            //creditsHeading.text = "Skapad av";
-            //resultCreatorsText = CreateResultText("Creators", 0.15f, 0.29f, 42f);
-            CreateReplayButton();
+            Debug.LogError("Koppla slutskärmens Result View, Result Score Text och Replay Button i GameController.", this);
+            return;
         }
 
+        // Layout, rubriker och namn redigeras direkt under Canvas/ResultView.
+        // Endast slutpoängen uppdateras här. Knappen är kopplad i scenens On Click.
         resultScoreText.text = Mathf.RoundToInt(Score).ToString();
-        resultCreatorsText.text = creatorNames;
         gameView.SetActive(false);
         startMenu.SetActive(false);
         resultView.SetActive(true);
         resultView.transform.SetAsLastSibling();
         replayButton.Select();
-    }
-
-    private void CreateReplayButton()
-    {
-        GameObject buttonObject = new GameObject(
-            "ReplayButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-        buttonObject.transform.SetParent(resultView.transform, false);
-        buttonObject.layer = resultView.layer;
-
-        RectTransform rect = buttonObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.35f, 0.04f);
-        rect.anchorMax = new Vector2(0.65f, 0.13f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-
-        Image background = buttonObject.GetComponent<Image>();
-        background.color = new Color(0.3f, 1f, 0.55f, 1f);
-        replayButton = buttonObject.GetComponent<Button>();
-        replayButton.targetGraphic = background;
-        replayButton.onClick.AddListener(StartGame);
-
-        TMP_Text label = CreateResultText("ReplayLabel", 0f, 1f, 32f);
-        label.transform.SetParent(buttonObject.transform, false);
-        label.rectTransform.anchorMin = new Vector2(0.05f, 0.1f);
-        label.rectTransform.anchorMax = new Vector2(0.95f, 0.9f);
-        label.rectTransform.offsetMin = Vector2.zero;
-        label.rectTransform.offsetMax = Vector2.zero;
-        label.color = new Color(0.04f, 0.04f, 0.08f, 1f);
-        label.text = "Spela igen";
-    }
-
-    private TMP_Text CreateResultText(string objectName, float bottom, float top, float fontSize)
-    {
-        GameObject textObject = new GameObject(objectName, typeof(RectTransform));
-        textObject.transform.SetParent(resultView.transform, false);
-        textObject.layer = resultView.layer;
-        TextMeshProUGUI text = textObject.AddComponent<TextMeshProUGUI>();
-        if (scoreText != null && scoreText.font != null)
-        {
-            text.font = scoreText.font;
-        }
-        text.alignment = TextAlignmentOptions.Center;
-        text.color = Color.white;
-        text.fontSize = fontSize;
-        text.enableAutoSizing = true;
-        text.fontSizeMin = 12f;
-        text.fontSizeMax = fontSize;
-        text.raycastTarget = false;
-        text.richText = false;
-
-        RectTransform rect = text.rectTransform;
-        rect.anchorMin = new Vector2(0.1f, bottom);
-        rect.anchorMax = new Vector2(0.9f, top);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-        return text;
     }
 
     private void UpdateScoreUI()
