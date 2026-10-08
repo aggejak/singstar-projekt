@@ -10,8 +10,8 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private Sprite singingSprite;
     [SerializeField] private Sprite sadSprite;
     // delay innan bild ändras
-    [SerializeField, Min(0f)] private float confirmationTime = 0.5f;
-    [SerializeField, Min(0f)] private float neutralDelay = 1f;
+    [SerializeField, Min(0f)] private float confirmationTime = 0.5f; // hur länge måste on ton hållas innan tommy byter
+    [SerializeField, Min(0f)] private float neutralDelay = 0.5f;
 
     private enum Emotion { Neutral, Singing, Sad }
 
@@ -32,42 +32,44 @@ public class CharacterController : MonoBehaviour
 
     private void OnEnable()
     {
-        ResetToNeutral();
+        ResetToNeutral(); // starta neutralt
     }
 
     private void LateUpdate()
     {
+        // återställ om kontrollern saknas, är inaktiv eller spelet inte körs
         if (gameController == null ||
             !gameController.isActiveAndEnabled ||
             !gameController.IsPlaying)
         {
             ResetToNeutral();
-            return;
+            return; // avsluta för denna frame
         }
-        double now = Time.timeAsDouble;
 
-        if (gameController.CurrentTarget == null)
+        double now = Time.timeAsDouble; // räkna i tid, inte frames
+
+        if (gameController.CurrentTarget == null) // ingen ton ska sjungas
         {
             if (!inBreak)
             {
                 inBreak = true;
-                breakStarted = now;
+                breakStarted = now; // pausen börjar och sparas
             }
 
-            // A gap interrupts pitch confirmation, but keeps the expression.
+            // avbryt pågående bekräftelse, men behåll nuvarande uttryck
             pendingEmotion = currentEmotion;
             pendingSince = now;
 
-            if (now - breakStarted >= neutralDelay)
+            if (now - breakStarted >= neutralDelay) // pausen har varat tillräckligt länge
             {
-                SetEmotion(Emotion.Neutral);
+                SetEmotion(Emotion.Neutral); // byt till neutralt uttryck
                 pendingEmotion = Emotion.Neutral;
             }
 
-            return;
+            return; // kontrollera inte sången under pausen
         }
 
-        // A new note ends the break and starts fresh pitch confirmation.
+        // en ny ton har börjat efter pausen
         if (inBreak)
         {
             inBreak = false;
@@ -75,8 +77,9 @@ public class CharacterController : MonoBehaviour
             pendingSince = now;
         }
 
+        // använd spelets befintliga kontroll för om spelaren sjunger rätt
         bool correct = gameController.HasPitch && gameController.OnPitch;
-        Emotion wanted = correct ? Emotion.Singing : Emotion.Sad;
+        Emotion wanted = correct ? Emotion.Singing : Emotion.Sad; // rätt => sjunger, annars ledsen
 
         if (wanted == currentEmotion)
         {
@@ -85,15 +88,15 @@ public class CharacterController : MonoBehaviour
             return;
         }
 
-        if (wanted != pendingEmotion)
+        if (wanted != pendingEmotion) // ett annat uttryck ska börja bekräftas
         {
-            pendingEmotion = wanted;
-            pendingSince = now;
+            pendingEmotion = wanted; // spara uttrycket vi väntar på
+            pendingSince = now;   // starta om tiden för bekräftelsen
         }
 
-        if (now - pendingSince >= confirmationTime)
+        if (now - pendingSince >= confirmationTime) // resultatet har hållit i sig tillräckligt länge
         {
-            SetEmotion(wanted);
+            SetEmotion(wanted); // byt uttryck
         }
     }
 
@@ -102,7 +105,7 @@ public class CharacterController : MonoBehaviour
         ResetToNeutral();
     }
 
-    private void ResetToNeutral()
+    private void ResetToNeutral() // nollställ & ta bort allt
     {
         inBreak = false;
         breakStarted = 0d;
