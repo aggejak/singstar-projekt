@@ -28,6 +28,7 @@ public class GameController : MonoBehaviour
     [Header("Slutskärm")]
     [SerializeField] private GameObject resultView;
     [SerializeField] private TMP_Text resultScoreText;
+    [SerializeField] private TMP_Text resultAccuracyText;
     [SerializeField] private Button replayButton;
 
     public bool IsPlaying { get; private set; }
@@ -38,6 +39,10 @@ public class GameController : MonoBehaviour
     public float SongTime => songAudioSource.time;
 
     public float Score { get; private set; }
+    public float MaxScore { get; private set; }
+    public float AccuracyPercent => MaxScore > 0f
+        ? Mathf.Clamp01(Score / MaxScore) * 100f
+        : 0f;
 
     private void Start()
     {
@@ -48,6 +53,7 @@ public class GameController : MonoBehaviour
         }
         startMenu.SetActive(true);
         gameView.SetActive(false);
+        CalculateMaxScore();
         UpdateScoreUI();
     }
 
@@ -92,6 +98,7 @@ public class GameController : MonoBehaviour
 
         songAudioSource.Play();
 
+        CalculateMaxScore();
         Score = 0f;
         HasPitch = false;
         OnPitch = false;
@@ -183,6 +190,17 @@ public class GameController : MonoBehaviour
         UpdateScoreUI();
     }
 
+    private void CalculateMaxScore()
+    {
+        // Bara måltonernas längd ger poäng; intro och pauser räknas inte.
+        double totalNoteSeconds = 0d;
+        foreach (TargetNote note in SongNotes.Notes)
+        {
+            totalNoteSeconds += System.Math.Max(0d, (double)note.endTime - note.startTime);
+        }
+        MaxScore = (float)(totalNoteSeconds * Mathf.Max(0f, maxPointsPerSecond));
+    }
+
     private void ShowResults()
     {
         if (resultView == null || resultScoreText == null || replayButton == null)
@@ -192,8 +210,12 @@ public class GameController : MonoBehaviour
         }
 
         // Layout, rubriker och namn redigeras direkt under Canvas/ResultView.
-        // Endast slutpoängen uppdateras här. Knappen är kopplad i scenens On Click.
+        // Resultatvärden uppdateras här. Knappen är kopplad i scenens On Click.
         resultScoreText.text = Mathf.RoundToInt(Score).ToString();
+        if (resultAccuracyText != null)
+        {
+            resultAccuracyText.text = $"Accuracy: {AccuracyPercent:F1}%";
+        }
         gameView.SetActive(false);
         startMenu.SetActive(false);
         resultView.SetActive(true);
