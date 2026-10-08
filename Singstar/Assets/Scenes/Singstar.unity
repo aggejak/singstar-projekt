@@ -267,7 +267,6 @@ GameObject:
   - component: {fileID: 108794906}
   - component: {fileID: 108794909}
   - component: {fileID: 108794908}
-  - component: {fileID: 108794907}
   m_Layer: 0
   m_Name: PitchArea BG
   m_TagString: Untagged
@@ -294,31 +293,6 @@ RectTransform:
   m_AnchoredPosition: {x: 200, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &108794907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 108794905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77628899bd8a5da47a4311033f1d349c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PitchVisualizer
-  gameController: {fileID: 73423353}
-  targetLine: {fileID: 0}
-  playerMarker: {fileID: 0}
-  playerImage: {fileID: 0}
-  playheadLine: {fileID: 0}
-  horizontalPadding: 40
-  verticalPadding: 36
-  pixelsPerSemitone: 20
-  barHeight: 12
-  noteColor: {r: 0.72, g: 0.79, b: 0.9, a: 1}
-  activeNoteColor: {r: 1, g: 0.9, b: 0.55, a: 1}
-  hitColor: {r: 0.3, g: 1, b: 0.55, a: 1}
-  offPitchColor: {r: 1, g: 0.4, b: 0.4, a: 1}
 --- !u!114 &108794908
 MonoBehaviour:
   m_ObjectHideFlags: 0
