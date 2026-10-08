@@ -33,6 +33,25 @@ public class PitchVisualizer : MonoBehaviour
     private TargetNote previousPaintTarget;
     private bool previousPaintHit;
 
+    [Header("Spår vid miss")]
+    [SerializeField, Range(0f, 1f)]
+    private float missTrailOpacity = 0.2f;
+
+    [Header("Spårets bredd")]
+    [SerializeField, Min(1f)]
+    private float minimumTrailWidth = 12f;
+
+    private readonly List<Image> missTrails = new List<Image>();
+    private int usedMissTrails;
+
+    private Image currentMissTrail;
+    private float missStartTime;
+    private float missY;
+
+    private float previousMissTime = float.NaN;
+    private float previousMissY;
+    private bool previousWasMiss;
+
     private readonly List<Image> noteBars = new List<Image>();
     private readonly List<Outline> noteGlows = new List<Outline>();
     private RectTransform pitchArea;
@@ -80,7 +99,12 @@ public class PitchVisualizer : MonoBehaviour
             noteGlows.Add(AddGlow(barImage));
 
             NotePaintTrail trail = bar.gameObject.AddComponent<NotePaintTrail>();
-            trail.Initialize(hitColor, trailGlowSize, trailGlowOpacity);
+            trail.Initialize(
+                hitColor,
+                trailGlowSize,
+                trailGlowOpacity,
+                minimumTrailWidth
+            );
             noteTrails.Add(trail);
         }
 
@@ -144,6 +168,7 @@ public class PitchVisualizer : MonoBehaviour
         UpdateNoteTrail(songTime, target, hit);
         UpdateNoteFeedback(songTime, target, hit, pulse);
         UpdatePlayerMarker(songTime, target, hasPitch, hit, pulse);
+        UpdateMissTrail(songTime, hasPitch && target != null && !hit);
     }
 
     private void LayoutGroup()
@@ -264,8 +289,116 @@ public class PitchVisualizer : MonoBehaviour
         previousPaintHit = hit;
     }
 
+    private void UpdateMissTrail(float songTime, bool isMiss)
+    {
+        float currentY = playerMarker.anchoredPosition.y;
+
+        if (!float.IsNaN(previousMissTime))
+        {
+            float elapsed = songTime - previousMissTime;
+
+            if (elapsed > 0f && elapsed <= 0.15f && previousWasMiss)
+            {
+                // Ny sträcka när vi börjar missa eller byter tonhöjd.
+                if (currentMissTrail == null ||
+                    !Mathf.Approximately(missY, previousMissY))
+                {
+                    currentMissTrail = GetMissTrail();
+                    missStartTime = previousMissTime;
+                    missY = previousMissY;
+                }
+
+                float startX = TimeToX(missStartTime);
+                float endX = TimeToX(songTime);
+
+                RectTransform rect = currentMissTrail.rectTransform;
+
+                rect.anchoredPosition = new Vector2(
+                    (startX + endX) * 0.5f,
+                    missY
+                );
+
+                rect.sizeDelta = new Vector2(
+                    Mathf.Max(minimumTrailWidth, endX - startX),
+                    barHeight
+                );
+            }
+            else if (elapsed != 0f)
+            {
+                // Koppla inte ihop spåret över tystnad eller tidshopp.
+                currentMissTrail = null;
+            }
+        }
+
+        if (!isMiss)
+        {
+            currentMissTrail = null;
+        }
+
+        previousMissTime = songTime;
+        previousMissY = currentY;
+        previousWasMiss = isMiss;
+    }
+
+    private Image GetMissTrail()
+    {
+        Image trail;
+
+        if (usedMissTrails < missTrails.Count)
+        {
+            trail = missTrails[usedMissTrails];
+        }
+        else
+        {
+            GameObject obj = new GameObject(
+                "MissTrail",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image)
+            );
+
+            trail = obj.GetComponent<Image>();
+            trail.rectTransform.SetParent(pitchArea, false);
+            SetCenteredAnchors(trail.rectTransform);
+
+            trail.raycastTarget = false;
+
+            // Bakom noterna, så att deras gröna spår syns tydligt.
+            trail.rectTransform.SetAsFirstSibling();
+
+            missTrails.Add(trail);
+        }
+
+        usedMissTrails++;
+
+        trail.color = new Color(
+            offPitchColor.r,
+            offPitchColor.g,
+            offPitchColor.b,
+            missTrailOpacity
+        );
+
+        trail.gameObject.SetActive(true);
+        return trail;
+    }
+
+    private void ClearMissTrails()
+    {
+        foreach (Image trail in missTrails)
+        {
+            trail.gameObject.SetActive(false);
+        }
+
+        usedMissTrails = 0;
+        currentMissTrail = null;
+        previousMissTime = float.NaN;
+        previousWasMiss = false;
+    }
+
     private void ResetNoteTrails()
     {
+        ClearMissTrails();
+
         foreach (NotePaintTrail trail in noteTrails)
         {
             trail.Clear();
