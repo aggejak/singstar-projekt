@@ -203,9 +203,9 @@ public class GameController : MonoBehaviour
             resultScoreText = CreateResultText("FinalScore", 0.43f, 0.62f, 100f);
             resultScoreText.color = new Color(0.3f, 1f, 0.55f, 1f);
 
-            TMP_Text creditsHeading = CreateResultText("CreditsHeading", 0.29f, 0.38f, 30f);
-            creditsHeading.text = "Skapad av";
-            resultCreatorsText = CreateResultText("Creators", 0.15f, 0.29f, 42f);
+            //TMP_Text creditsHeading = CreateResultText("CreditsHeading", 0.29f, 0.38f, 30f);
+            //creditsHeading.text = "Skapad av";
+            //resultCreatorsText = CreateResultText("Creators", 0.15f, 0.29f, 42f);
             CreateReplayButton();
         }
 
