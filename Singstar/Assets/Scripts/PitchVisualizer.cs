@@ -103,9 +103,19 @@ public class PitchVisualizer : MonoBehaviour
                 hitColor,
                 trailGlowSize,
                 trailGlowOpacity,
-                minimumTrailWidth
+                minimumTrailWidth,
+                barImage.sprite
             );
             noteTrails.Add(trail);
+
+            Mask mask = barImage.GetComponent<Mask>();
+
+            if (mask == null)
+            {
+                mask = barImage.gameObject.AddComponent<Mask>();
+            }
+
+            mask.showMaskGraphic = true;
         }
 
         playerMarker.SetAsLastSibling();
@@ -358,6 +368,10 @@ public class PitchVisualizer : MonoBehaviour
             );
 
             trail = obj.GetComponent<Image>();
+            trail.sprite = targetLine.GetComponent<Image>().sprite;
+            trail.type = Image.Type.Sliced;
+            trail.fillCenter = true;
+
             trail.rectTransform.SetParent(pitchArea, false);
             SetCenteredAnchors(trail.rectTransform);
 

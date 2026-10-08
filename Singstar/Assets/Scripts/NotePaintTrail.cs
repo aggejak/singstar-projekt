@@ -19,12 +19,20 @@ public class NotePaintTrail : MonoBehaviour
     private float glowOpacity;
     private float minimumWidth;
 
-    public void Initialize( Color color, float size, float opacity, float minWidth)
+    private Sprite trailSprite;
+
+    public void Initialize(
+    Color color,
+    float size,
+    float opacity,
+    float minWidth,
+    Sprite sprite)
     {
         paintColor = color;
         glowSize = size;
         glowOpacity = opacity;
         minimumWidth = minWidth;
+        trailSprite = sprite;
     }
 
     public void Clear()
@@ -152,6 +160,9 @@ public class NotePaintTrail : MonoBehaviour
         rect.offsetMax = Vector2.one * expansion;
 
         Image image = obj.GetComponent<Image>();
+        image.sprite = trailSprite;
+        image.type = Image.Type.Sliced;
+        image.fillCenter = true;
         image.raycastTarget = false;
         image.color = new Color(
             paintColor.r,
