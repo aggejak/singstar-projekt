@@ -22,6 +22,17 @@ public class PitchVisualizer : MonoBehaviour
     [SerializeField] private Color hitColor = new Color(0.3f, 1f, 0.55f, 1f);
     [SerializeField] private Color offPitchColor = new Color(1f, 0.4f, 0.4f, 1f);
 
+    [Header("Målat notspår")]
+    [SerializeField, Min(0f)] private float trailGlowSize = 5f;
+    [SerializeField, Range(0f, 1f)] private float trailGlowOpacity = 0.2f;
+
+    private readonly List<NotePaintTrail> noteTrails =
+        new List<NotePaintTrail>();
+
+    private float previousPaintTime = float.NaN;
+    private TargetNote previousPaintTarget;
+    private bool previousPaintHit;
+
     private readonly List<Image> noteBars = new List<Image>();
     private readonly List<Outline> noteGlows = new List<Outline>();
     private RectTransform pitchArea;
@@ -41,6 +52,8 @@ public class PitchVisualizer : MonoBehaviour
         SetCenteredAnchors(playerMarker);
         playerImage.raycastTarget = false;
         markerGlow = AddGlow(playerImage);
+
+
 
         // Den gamla linjen är endast en mall. Kvadraten visar nu tiden.
         targetLine.gameObject.SetActive(false);
@@ -65,6 +78,10 @@ public class PitchVisualizer : MonoBehaviour
             barImage.raycastTarget = false;
             noteBars.Add(barImage);
             noteGlows.Add(AddGlow(barImage));
+
+            NotePaintTrail trail = bar.gameObject.AddComponent<NotePaintTrail>();
+            trail.Initialize(hitColor, trailGlowSize, trailGlowOpacity);
+            noteTrails.Add(trail);
         }
 
         playerMarker.SetAsLastSibling();
@@ -105,9 +122,15 @@ public class PitchVisualizer : MonoBehaviour
             return;
         }
 
-        if (group != currentGroup || layoutSize != pitchArea.rect.size)
+        if (group != currentGroup)
         {
+            ResetNoteTrails();
             currentGroup = group;
+            LayoutGroup();
+        }
+        else if (layoutSize != pitchArea.rect.size)
+        {
+            // Behåll det målade spåret när fönstret ändrar storlek.
             LayoutGroup();
         }
 
@@ -118,6 +141,7 @@ public class PitchVisualizer : MonoBehaviour
         bool hit = hasPitch && target != null && gameController.OnPitch;
         float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 12f);
 
+        UpdateNoteTrail(songTime, target, hit);
         UpdateNoteFeedback(songTime, target, hit, pulse);
         UpdatePlayerMarker(songTime, target, hasPitch, hit, pulse);
     }
@@ -181,20 +205,99 @@ public class PitchVisualizer : MonoBehaviour
         return (midi - groupCenterMidi) * pitchScale;
     }
 
-    private void UpdateNoteFeedback(float songTime, TargetNote target, bool hit, float pulse)
+    private void UpdateNoteTrail(
+    float songTime,
+    TargetNote target,
+    bool hit)
+    {
+        if (!float.IsNaN(previousPaintTime))
+        {
+            float elapsed = songTime - previousPaintTime;
+
+            if (elapsed < 0f)
+            {
+                // Låten har startats om eller spolats bakåt.
+                ResetNoteTrails();
+            }
+            else if (elapsed > 0f &&
+                     elapsed <= 0.15f &&
+                     previousPaintHit &&
+                     previousPaintTarget != null)
+            {
+                // Vid ett stort tidshopp målar vi inte över okänd sång.
+                for (int i = 0; i < currentGroup.Notes.Length; i++)
+                {
+                    TargetNote note = currentGroup.Notes[i];
+
+                    if (note != previousPaintTarget)
+                        continue;
+
+                    float startTime = Mathf.Max(
+                        previousPaintTime, note.startTime);
+
+                    float endTime = Mathf.Min(
+                        songTime, note.endTime);
+
+                    if (endTime <= startTime)
+                        break;
+
+                    RectTransform bar = noteBars[i].rectTransform;
+                    float width = bar.rect.width;
+
+                    if (width <= 0f)
+                        break;
+
+                    float leftX = bar.anchoredPosition.x - width * 0.5f;
+
+                    // Samma tidsposition som markören, klippt till baren.
+                    float from = (TimeToX(startTime) - leftX) / width;
+                    float to = (TimeToX(endTime) - leftX) / width;
+
+                    noteTrails[i].Paint(from, to);
+                    break;
+                }
+            }
+        }
+
+        previousPaintTime = songTime;
+        previousPaintTarget = target;
+        previousPaintHit = hit;
+    }
+
+    private void ResetNoteTrails()
+    {
+        foreach (NotePaintTrail trail in noteTrails)
+        {
+            trail.Clear();
+        }
+
+        previousPaintTime = float.NaN;
+        previousPaintTarget = null;
+        previousPaintHit = false;
+    }
+    private void UpdateNoteFeedback(
+    float songTime,
+    TargetNote target,
+    bool hit,
+    float pulse)
     {
         for (int i = 0; i < currentGroup.Notes.Length; i++)
         {
             TargetNote note = currentGroup.Notes[i];
-            bool isCurrent = note == target;
-            Color color = isCurrent ? (hit ? hitColor : activeNoteColor) : noteColor;
+
+            Color color = note == target
+                ? activeNoteColor
+                : noteColor;
+
             if (songTime >= note.endTime)
             {
                 color.a *= 0.45f;
             }
+
             noteBars[i].color = color;
-            noteGlows[i].enabled = isCurrent && hit;
-            noteGlows[i].effectColor = new Color(hitColor.r, hitColor.g, hitColor.b, 0.25f + pulse * 0.35f);
+
+            // Skenet finns nu runt de målade delarna.
+            noteGlows[i].enabled = false;
         }
     }
 
@@ -271,6 +374,7 @@ public class PitchVisualizer : MonoBehaviour
 
     private void HideEverything()
     {
+        ResetNoteTrails();
         currentGroup = null;
         foreach (Image bar in noteBars)
         {
