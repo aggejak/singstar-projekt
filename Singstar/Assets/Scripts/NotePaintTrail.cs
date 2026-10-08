@@ -17,12 +17,14 @@ public class NotePaintTrail : MonoBehaviour
     private Color paintColor;
     private float glowSize;
     private float glowOpacity;
+    private float minimumWidth;
 
-    public void Initialize(Color color, float size, float opacity)
+    public void Initialize( Color color, float size, float opacity, float minWidth)
     {
         paintColor = color;
         glowSize = size;
         glowOpacity = opacity;
+        minimumWidth = minWidth;
     }
 
     public void Clear()
@@ -70,9 +72,35 @@ public class NotePaintTrail : MonoBehaviour
             stroke.rect.gameObject.SetActive(true);
         }
 
-        // Relativa ankare gör att spåret följer barens storlek.
-        stroke.rect.anchorMin = new Vector2(stroke.start, 0f);
-        stroke.rect.anchorMax = new Vector2(stroke.end, 1f);
+        float barWidth = ((RectTransform)transform).rect.width;
+
+        if (barWidth <= 0f)
+            return;
+
+        // Sparad träfflängd är oförändrad.
+        // Endast den synliga sträckan får en minsta bredd.
+        float minimumFraction = Mathf.Clamp01(minimumWidth / barWidth);
+
+        float visibleWidth = Mathf.Min(
+            1f,
+            Mathf.Max(stroke.end - stroke.start, minimumFraction)
+        );
+
+        float center = (stroke.start + stroke.end) * 0.5f;
+
+        // Håll den gröna färgen inom notbarens kanter.
+        float visibleStart = Mathf.Clamp(
+            center - visibleWidth * 0.5f,
+            0f,
+            1f - visibleWidth
+        );
+
+        stroke.rect.anchorMin = new Vector2(visibleStart, 0f);
+        stroke.rect.anchorMax = new Vector2(
+            visibleStart + visibleWidth,
+            1f
+        );
+
         stroke.rect.offsetMin = Vector2.zero;
         stroke.rect.offsetMax = Vector2.zero;
     }
