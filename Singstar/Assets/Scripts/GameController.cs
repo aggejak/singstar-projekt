@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject gameView;
     [SerializeField] private MicrophoneInput microphoneInput;
     [SerializeField] private AudioSource songAudioSource;
+    [SerializeField] private AudioSource VocalsAudioSource;
     [SerializeField] private PitchLogger pitchLogger;
     [SerializeField] private PitchAnalyzer pitchAnalyzer;
 
@@ -78,6 +79,8 @@ public class GameController : MonoBehaviour
         else
         {
             inputStarted = audioFileInput.StartInput();
+            VocalsAudioSource.Play();
+
         }
 
         if (!inputStarted)
