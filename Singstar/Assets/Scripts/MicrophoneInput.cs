@@ -35,7 +35,7 @@ public class MicrophoneInput : MonoBehaviour // inherit from MonoBehaviour to be
         // kolla att dropdownen är ansluten i Unity
         if (microphoneDropdown == null)
         {
-            Debug.LogError("Assign the microphone dropdown in the Inspector.");
+            Debug.LogError("Dropdown inte ansluten i unity");
             return;
         }
 
