@@ -1,43 +1,52 @@
 fileFormatVersion: 2
-guid: 2df29ff1f7b9255408f93f0b8141d9ba
+guid: 3cb2cddf30743a84c8358fe89c6d5686
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1946819286353055221
-    second: lyrics_01289_0
+      213: -8556655379958851812
+    second: LYRICS_2_0
   - first:
-      213: 2248079501827007804
-    second: lyrics_01289_1
+      213: -720959193442618833
+    second: LYRICS_2_1
   - first:
-      213: -3497219188229685853
-    second: lyrics_01289_2
+      213: -1320586661382370847
+    second: LYRICS_2_2
   - first:
-      213: 2594334305724756391
-    second: lyrics_01289_3
+      213: -2455212911831628367
+    second: LYRICS_2_3
   - first:
-      213: 1886735160700515068
-    second: lyrics_01289_4
+      213: -7664583708520738205
+    second: LYRICS_2_4
   - first:
-      213: -8933521491988787789
-    second: lyrics_01289_5
+      213: 4359830094531678056
+    second: LYRICS_2_5
   - first:
-      213: 2664865988491313142
-    second: lyrics_01289_6
+      213: 2697113743227770150
+    second: LYRICS_2_6
   - first:
-      213: -4503644745298049645
-    second: lyrics_01289_7
+      213: -173442242709550354
+    second: LYRICS_2_7
   - first:
-      213: -886015004111959593
-    second: lyrics_01289_8
+      213: 906811164536424738
+    second: LYRICS_2_8
   - first:
-      213: 8048376139069542921
-    second: lyrics_01289_9
+      213: 7100868598067169434
+    second: LYRICS_2_9
   - first:
-      213: 1589918891339986237
-    second: lyrics_01289_10
+      213: 644580326452111787
+    second: LYRICS_2_10
   - first:
-      213: 7845347798855341886
-    second: lyrics_01289_11
+      213: 2563869396546407621
+    second: LYRICS_2_11
+  - first:
+      213: -4218459920966831349
+    second: LYRICS_2_12
+  - first:
+      213: -3638550636525347669
+    second: LYRICS_2_13
+  - first:
+      213: 8449883702673160787
+    second: LYRICS_2_14
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -148,13 +157,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: lyrics_01289_0
+      name: LYRICS_2_0
       rect:
         serializedVersion: 2
-        x: 100
-        y: 52
-        width: 153
-        height: 101
+        x: 55
+        y: 81
+        width: 23
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -163,20 +172,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5fd04f483dd740b10800000000000000
-      internalID: 1946819286353055221
+      spriteID: c171e1c5447a04980800000000000000
+      internalID: -8556655379958851812
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: lyrics_01289_1
+      name: LYRICS_2_1
       rect:
         serializedVersion: 2
-        x: 287
-        y: 52
-        width: 93
-        height: 101
+        x: 60
+        y: 139
+        width: 16
+        height: 18
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -185,20 +194,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c356c356568c23f10800000000000000
-      internalID: 2248079501827007804
+      spriteID: f22fc41fe63aef5f0800000000000000
+      internalID: -720959193442618833
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: lyrics_01289_2
+      name: LYRICS_2_2
       rect:
         serializedVersion: 2
-        x: 377
-        y: 51
-        width: 82
-        height: 107
+        x: 106
+        y: 82
+        width: 138
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -207,151 +216,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3adb3e76da1677fc0800000000000000
-      internalID: -3497219188229685853
+      spriteID: 1e94f21ad655cade0800000000000000
+      internalID: -1320586661382370847
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: lyrics_01289_3
+      name: LYRICS_2_3
       rect:
         serializedVersion: 2
-        x: 456
-        y: 54
-        width: 80
-        height: 103
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7a175514e4de00420800000000000000
-      internalID: 2594334305724756391
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_4
-      rect:
-        serializedVersion: 2
-        x: 571
-        y: 58
-        width: 82
-        height: 84
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cf23bced1a70f2a10800000000000000
-      internalID: 1886735160700515068
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_5
-      rect:
-        serializedVersion: 2
-        x: 663
-        y: 138
-        width: 20
-        height: 19
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3bdc0bce881c50480800000000000000
-      internalID: -8933521491988787789
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_6
-      rect:
-        serializedVersion: 2
-        x: 684
-        y: 51
-        width: 65
-        height: 94
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6ff7b0a5f718bf420800000000000000
-      internalID: 2664865988491313142
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_7
-      rect:
-        serializedVersion: 2
-        x: 786
-        y: 57
+        x: 271
+        y: 74
         width: 18
-        height: 92
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 39584f927f6df71c0800000000000000
-      internalID: -4503644745298049645
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_8
-      rect:
-        serializedVersion: 2
-        x: 815
-        y: 138
-        width: 21
-        height: 19
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7d98d3e4c0e34b3f0800000000000000
-      internalID: -886015004111959593
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: lyrics_01289_9
-      rect:
-        serializedVersion: 2
-        x: 835
-        y: 65
-        width: 62
         height: 79
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -361,20 +238,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 90258f3d47391bf60800000000000000
-      internalID: 8048376139069542921
+      spriteID: 1b5c25e6dd45dedd0800000000000000
+      internalID: -2455212911831628367
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: lyrics_01289_10
+      name: LYRICS_2_4
       rect:
         serializedVersion: 2
-        x: 662
-        y: 66
-        width: 21
-        height: 70
+        x: 295
+        y: 74
+        width: 44
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -383,19 +260,195 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d35b004dec6801610800000000000000
-      internalID: 1589918891339986237
+      spriteID: 362106ec9bde1a590800000000000000
+      internalID: -7664583708520738205
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: lyrics_01289_11
+      name: LYRICS_2_5
       rect:
         serializedVersion: 2
-        x: 813
-        y: 66
-        width: 20
+        x: 347
+        y: 79
+        width: 48
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86f4e912f5a318c30800000000000000
+      internalID: 4359830094531678056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_6
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 79
+        width: 56
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6255ae7d8a21e6520800000000000000
+      internalID: 2697113743227770150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_7
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 79
+        width: 51
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eea004ef23fc79df0800000000000000
+      internalID: -173442242709550354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_8
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 80
+        width: 50
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2294d8c13f3a59c00800000000000000
+      internalID: 906811164536424738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_9
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 74
+        width: 48
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9805803e5a5b8260800000000000000
+      internalID: 7100868598067169434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_10
+      rect:
+        serializedVersion: 2
+        x: 633
+        y: 79
+        width: 53
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba9226b446202f800800000000000000
+      internalID: 644580326452111787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_11
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 79
+        width: 53
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ccc4a7d1a1b49320800000000000000
+      internalID: 2563869396546407621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_12
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 74
+        width: 45
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b03bc8f5d050575c0800000000000000
+      internalID: -4218459920966831349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_13
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 75
+        width: 69
         height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -405,8 +458,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e375a22b14640ec60800000000000000
-      internalID: 7845347798855341886
+      spriteID: bac92a45975418dc0800000000000000
+      internalID: -3638550636525347669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LYRICS_2_14
+      rect:
+        serializedVersion: 2
+        x: 893
+        y: 79
+        width: 47
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35a323b4574044570800000000000000
+      internalID: 8449883702673160787
       vertices: []
       indices: 
       edges: []
@@ -425,18 +500,21 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      lyrics_01289_0: 1946819286353055221
-      lyrics_01289_1: 2248079501827007804
-      lyrics_01289_10: 1589918891339986237
-      lyrics_01289_11: 7845347798855341886
-      lyrics_01289_2: -3497219188229685853
-      lyrics_01289_3: 2594334305724756391
-      lyrics_01289_4: 1886735160700515068
-      lyrics_01289_5: -8933521491988787789
-      lyrics_01289_6: 2664865988491313142
-      lyrics_01289_7: -4503644745298049645
-      lyrics_01289_8: -886015004111959593
-      lyrics_01289_9: 8048376139069542921
+      LYRICS_2_0: -8556655379958851812
+      LYRICS_2_1: -720959193442618833
+      LYRICS_2_10: 644580326452111787
+      LYRICS_2_11: 2563869396546407621
+      LYRICS_2_12: -4218459920966831349
+      LYRICS_2_13: -3638550636525347669
+      LYRICS_2_14: 8449883702673160787
+      LYRICS_2_2: -1320586661382370847
+      LYRICS_2_3: -2455212911831628367
+      LYRICS_2_4: -7664583708520738205
+      LYRICS_2_5: 4359830094531678056
+      LYRICS_2_6: 2697113743227770150
+      LYRICS_2_7: -173442242709550354
+      LYRICS_2_8: 906811164536424738
+      LYRICS_2_9: 7100868598067169434
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
