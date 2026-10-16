@@ -3,12 +3,14 @@ public class TargetNote
     public float startTime;
     public float endTime;
     public float targetMidi;
+    public string lyric;
 
-    public TargetNote(float startTime, float endTime, float targetMidi)
+    public TargetNote(float startTime, float endTime, float targetMidi, string lyric)
     {
         this.startTime = startTime;
         this.endTime = endTime;
         this.targetMidi = targetMidi + SongNotes.PitchOffset;
+        this.lyric = lyric;
     }
 }
 
@@ -74,67 +76,67 @@ public static class SongNotes
         new TargetNoteGroup(
             11.00f, //fönster start
             18.00f,
-            new TargetNote(12.24f, 13.78f, B3),  // Stad
-            new TargetNote(13.88f, 15.46f, C4),  // i
-            new TargetNote(15.56f, 17.20f, D4)   // ljus
+            new TargetNote(12.24f, 13.78f, B3, "Stad"), // Stad
+            new TargetNote(13.88f, 15.46f, C4, "i"), // i
+            new TargetNote(15.56f, 17.20f, D4, "ljus") // ljus
         ),
         new TargetNoteGroup(
             17.20f,
-            new TargetNote(18.00f, 18.34f, E4),  // i
-            new TargetNote(18.44f, 18.90f, Fs4), // ett
-            new TargetNote(19.00f, 20.57f, G4),  // land
-            new TargetNote(20.67f, 21.40f, C4),  // u-
-            new TargetNote(21.50f, 22.23f, B3),  // -tan
-            new TargetNote(22.33f, 24.00f, A3)   // namn
+            new TargetNote(18.00f, 18.34f, E4, "i"), // i
+            new TargetNote(18.44f, 18.90f, Fs4, "ett"), // ett
+            new TargetNote(19.00f, 20.57f, G4, "land"), // land
+            new TargetNote(20.67f, 21.40f, C4, "u-"), // u-
+            new TargetNote(21.50f, 22.23f, B3, "-tan"), // -tan
+            new TargetNote(22.33f, 24.00f, A3, "namn") // namn
         ),
         // Paus 24.83–25.67
         new TargetNoteGroup(
             24.00f,
-            new TargetNote(25.67f, 27.23f, B3),  // Ge
-            new TargetNote(27.33f, 28.90f, Fs4), // mig
-            new TargetNote(29.00f, 30.50f, G4)   // liv
+            new TargetNote(25.67f, 27.23f, B3, "Ge"), // Ge
+            new TargetNote(27.33f, 28.90f, Fs4, "mig"), // mig
+            new TargetNote(29.00f, 30.50f, G4, "liv") // liv
         ),
         new TargetNoteGroup(
             30.50f,
-            new TargetNote(31.08f, 31.40f, G4),  // där
-            new TargetNote(31.50f, 31.82f, E4),  // all-
-            new TargetNote(31.92f, 32.23f, C4),  // -ting
-            new TargetNote(32.33f, 33.90f, B3),  // föds
-            new TargetNote(34.00f, 35.57f, A3),  // på
-            new TargetNote(35.67f, 37.26f, G3)   // nytt
+            new TargetNote(31.08f, 31.40f, G4, "där"), // där
+            new TargetNote(31.50f, 31.82f, E4, "all-"), // all-
+            new TargetNote(31.92f, 32.23f, C4, "-ting"), // -ting
+            new TargetNote(32.33f, 33.90f, B3, "föds"), // föds
+            new TargetNote(34.00f, 35.57f, A3, "på"), // på
+            new TargetNote(35.67f, 37.26f, G3, "nytt") // nytt
         ),
         // Andra refrängen
         new TargetNoteGroup(
             37.26f,
-            new TargetNote(39.00f, 40.58f, B3),  // Stad
-            new TargetNote(40.68f, 42.26f, C4),  // i
-            new TargetNote(42.36f, 44.10f, D4)   // ljus
+            new TargetNote(39.00f, 40.58f, B3, "Stad"), // Stad
+            new TargetNote(40.68f, 42.26f, C4, "i"), // i
+            new TargetNote(42.36f, 44.10f, D4, "ljus") // ljus
         ),
         new TargetNoteGroup(
             44.2f,
-            new TargetNote(44.88f, 45.20f, E4),   // i
-            new TargetNote(45.30f, 45.62f, Fs4), // ett
-            new TargetNote(45.72f, 47.30f, G4),  // land
-            new TargetNote(47.40f, 48.14f, C4),  // u-
-            new TargetNote(48.24f, 48.98f, B3),  // -tan
-            new TargetNote(49.08f, 50.62f, A3)   // namn
+            new TargetNote(44.88f, 45.20f, E4, "i"), // i
+            new TargetNote(45.30f, 45.62f, Fs4, "ett"), // ett
+            new TargetNote(45.72f, 47.30f, G4, "land"), // land
+            new TargetNote(47.40f, 48.14f, C4, "u-"), // u-
+            new TargetNote(48.24f, 48.98f, B3, "-tan"), // -tan
+            new TargetNote(49.08f, 50.62f, A3, "namn") // namn
         ),
         // Paus 51.60–52.44
         new TargetNoteGroup(
             50.62f,
-            new TargetNote(52.44f, 53.18f, B3),  // Ge
-            new TargetNote(53.68f, 54.72f, B4),  // GEEE
-            new TargetNote(54.92f, 55.70f, Fs4), // mig
-            new TargetNote(55.88f, 57.25f, G4)   // liv
+            new TargetNote(52.44f, 53.18f, B3, "Ge"), // Ge
+            new TargetNote(53.68f, 54.72f, B4, "GEEE"), // GEEE
+            new TargetNote(54.92f, 55.70f, Fs4, "mig"), // mig
+            new TargetNote(55.88f, 57.25f, G4, "liv") // liv
         ),
         new TargetNoteGroup(
             57.25f,
-            new TargetNote(57.90f, 58.22f, G4),  // där
-            new TargetNote(58.32f, 58.64f, E4),  // all-
-            new TargetNote(58.74f, 59.02f, C4),  // -ting
-            new TargetNote(59.12f, 59.90f, D4),  // föds
-            new TargetNote(60.84f, 62.42f, Fs4), // på
-            new TargetNote(62.52f, 67.28f, G4)   // nytt
+            new TargetNote(57.90f, 58.22f, G4, "där"), // där
+            new TargetNote(58.32f, 58.64f, E4, "all-"), // all-
+            new TargetNote(58.74f, 59.02f, C4, "-ting"), // -ting
+            new TargetNote(59.12f, 59.90f, D4, "föds"), // föds
+            new TargetNote(60.84f, 62.42f, Fs4, "på"), // på
+            new TargetNote(62.52f, 67.28f, G4, "nytt") // nytt
         )
     };
 
