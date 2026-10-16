@@ -25,7 +25,11 @@ public class GameController : MonoBehaviour
     [Header("Scoring")]
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private float maxPointsPerSecond = 100f;
-    private TMP_Text lyricText;
+
+    [Header("Lyrics")]
+    [SerializeField] private TMP_Text lyricBaseText;
+    [SerializeField] private TMP_Text lyricSweepText;
+    private string displayedLyric = string.Empty;
 
     [Header("Slutskärm")]
     [SerializeField] private GameObject resultView;
@@ -55,7 +59,6 @@ public class GameController : MonoBehaviour
         }
         startMenu.SetActive(true);
         gameView.SetActive(false);
-        CreateLyricText();
         CalculateMaxScore();
         UpdateScoreUI();
     }
@@ -125,10 +128,7 @@ public class GameController : MonoBehaviour
         OnPitch = false;
         CurrentMidi = float.NaN;
         CurrentTarget = SongNotes.GetCurrentNote(SongTime);
-        if (lyricText != null)
-        {
-            lyricText.text = CurrentTarget != null ? CurrentTarget.lyric : string.Empty;
-        }
+        UpdateLyricDisplay();
 
         if (!songAudioSource.isPlaying)
         {
@@ -232,38 +232,35 @@ public class GameController : MonoBehaviour
         replayButton.Select();
     }
 
-    private void CreateLyricText()
+    private void UpdateLyricDisplay()
     {
-        if (gameView == null)
+        if (lyricBaseText == null || lyricSweepText == null)
         {
             return;
         }
 
-        GameObject lyricObject = new GameObject(
-            "Lyrics",
-            typeof(RectTransform),
-            typeof(CanvasRenderer),
-            typeof(TextMeshProUGUI)
-        );
-        lyricObject.transform.SetParent(gameView.transform, false);
+        if (!SongNotes.TryGetCurrentLyric(
+                SongTime,
+                out string lyric,
+                out float startTime,
+                out float endTime))
+        {
+            lyricBaseText.text = string.Empty;
+            lyricSweepText.text = string.Empty;
+            displayedLyric = string.Empty;
+            return;
+        }
 
-        RectTransform rect = lyricObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.1f, 0.04f);
-        rect.anchorMax = new Vector2(0.9f, 0.18f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
+        if (displayedLyric != lyric)
+        {
+            lyricBaseText.text = lyric;
+            lyricSweepText.text = lyric;
+            displayedLyric = lyric;
+        }
 
-        lyricText = lyricObject.GetComponent<TextMeshProUGUI>();
-        lyricText.font = TMP_Settings.defaultFontAsset;
-        lyricText.fontSize = 36f;
-        lyricText.enableAutoSizing = true;
-        lyricText.fontSizeMin = 18f;
-        lyricText.fontSizeMax = 36f;
-        lyricText.alignment = TextAlignmentOptions.Center;
-        lyricText.fontStyle = FontStyles.Bold;
-        lyricText.color = Color.white;
-        lyricText.raycastTarget = false;
-        lyricText.text = string.Empty;
+        float progress = Mathf.InverseLerp(startTime, endTime, SongTime);
+        lyricSweepText.maxVisibleCharacters =
+            Mathf.Clamp(Mathf.RoundToInt(progress * lyric.Length), 0, lyric.Length);
     }
 
     private void UpdateScoreUI()
